@@ -1548,7 +1548,9 @@ game
 .
  ; 
 
-.L08 ;  pfcolors:
+.L08 ;  rem setting colors for the playfield's rows
+
+.L09 ;  pfcolors:
 
  lda # $00
  sta COLUPF
@@ -1564,7 +1566,26 @@ game
  lda #<(pfcolorlabel13-84)
  endif
  sta pfcolortable
-.L09 ;  playfield:
+.
+ ; 
+
+.L010 ;  player0color:
+
+	LDA #<playercolorL010_0
+
+	STA player0color
+	LDA #>playercolorL010_0
+
+	STA player0color+1
+.
+ ; 
+
+.
+ ; 
+
+.L011 ;  rem drawing the playfield
+
+.L012 ;  playfield:
 
   ifconst pfres
 	  ldx #(11>pfres)*(pfres*pfwidth-1)+(11<=pfres)*43
@@ -1592,20 +1613,79 @@ pflabel0
 .
  ; 
 
-.L010 ;  COLUBK  =  $9E
+.L013 ;  rem defining the player
 
-	LDA #$9E
-	STA COLUBK
+.L014 ;  player0:
+
+	LDA #<playerL014_0
+
+	STA player0pointerlo
+	LDA #>playerL014_0
+
+	STA player0pointerhi
+	LDA #7
+	STA player0height
 .
  ; 
+
+.L015 ;  player0x  =  75
+
+	LDA #75
+	STA player0x
+.L016 ;  player0y  = 88
+
+	LDA #88
+	STA player0y
+.
+ ; 
+
+.L017 ;  rem displays the screen
 
 .draw_loop
  ; draw_loop
 
-.L011 ;  drawscreen
+.L018 ;  rem color of background
+
+.L019 ;  COLUBK  =  $9E
+
+	LDA #$9E
+	STA COLUBK
+.L020 ;  COLUP0  =  14
+
+	LDA #14
+	STA COLUP0
+.L021 ;  drawscreen
 
  jsr drawscreen
-.L012 ;  goto draw_loop
+.L022 ;  if joy0right then player0x  =  player0x  +  1 :  if player0x  >  153 then player0x  =  153
+
+ bit SWCHA
+	BMI .skipL022
+.condpart0
+	INC player0x
+	LDA #153
+	CMP player0x
+     BCS .skip0then
+.condpart1
+	LDA #153
+	STA player0x
+.skip0then
+.skipL022
+.L023 ;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =  1
+
+ bit SWCHA
+	BVS .skipL023
+.condpart2
+	DEC player0x
+	LDA player0x
+	CMP #1
+     BCS .skip2then
+.condpart3
+	LDA #1
+	STA player0x
+.skip2then
+.skipL023
+.L024 ;  goto draw_loop
 
  jmp .draw_loop
 
@@ -1639,6 +1719,36 @@ pfcolorlabel13
  .byte  $00,0,0,0
  .byte  $00,0,0,0
  .byte  $00,0,0,0
+ if (<*) > (<(*+8))
+	repeat ($100-<*)
+	.byte 0
+	repend
+	endif
+playercolorL010_0
+
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+ if (<*) > (<(*+8))
+	repeat ($100-<*)
+	.byte 0
+	repend
+	endif
+playerL014_0
+
+	.byte  %11111111
+	.byte  %11111111
+	.byte  %00000000
+	.byte  %00000000
+	.byte  %00000000
+	.byte  %00000000
+	.byte  %00000000
+	.byte  %00000000
        echo "    ",[(scoretable - *)]d , "bytes of ROM space left")
  
  
