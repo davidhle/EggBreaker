@@ -62,14 +62,8 @@ end
 
  rem defining the player
  player0:
- %11111111
- %11111111
- %00000000
- %00000000
- %00000000
- %00000000
- %00000000
- %00000000
+  %1111111
+  %1111111
 end
 
  player1:
@@ -90,6 +84,13 @@ end
  player1x = 30
  player1y = 16
 
+ ballheight = 0
+ ballx = 80
+ bally = 70
+
+ dim xDirection = 1
+ dim yDirection = 1
+
  rem displays the screen
 draw_loop
  rem color of background
@@ -98,6 +99,8 @@ draw_loop
  COLUP1 = 14
 
  drawscreen
+ bally = bally + yDirection
+ if collision(ball, player0) then yDirection = -1
  if joy0right then player0x = player0x + 1: if player0x > 153 then player0x = 153
  if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 1
  goto draw_loop

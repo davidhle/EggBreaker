@@ -711,7 +711,11 @@
       0  10000 ????				       include	"2600basic_variable_redefs.h"
       1  10000 ????						; This file contains variable mapping and other information for the current project.
       2  10000 ????
-      3  10000 ????		00 01	    PFcolors   =	1
+      3  10000 ????		00 01	    yDirection =	1
+      4  10000 ????
+      5  10000 ????		00 01	    xDirection =	1
+      6  10000 ????
+      7  10000 ????		00 01	    PFcolors   =	1
 ------- FILE 2600basic.h
       5  10000 ????
       6  10000 ????		00 80	    player0x   =	$80
@@ -947,7 +951,11 @@
       0  10000 ????				       include	"2600basic_variable_redefs.h"
       1  10000 ????						; This file contains variable mapping and other information for the current project.
       2  10000 ????
-      3  10000 ????		00 01	    PFcolors   =	1
+      3  10000 ????		00 01	    yDirection =	1
+      4  10000 ????
+      5  10000 ????		00 01	    xDirection =	1
+      6  10000 ????
+      7  10000 ????		00 01	    PFcolors   =	1
 ------- FILE ../EggBreaker/EggBreaker.bas.asm
       6  10000 ????			   -	       ifconst	bankswitch
       7  10000 ????			   -	       if	bankswitch == 8
@@ -2736,7 +2744,7 @@
    1563  f497				  -	      ifconst	pfres
    1564  f497				  -	      lda	#<(pfcolorlabel13-132+pfres*pfwidth)
    1565  f497					      else
-   1566  f497		       a9 04		      lda	#<(pfcolorlabel13-84)
+   1566  f497		       a9 07		      lda	#<(pfcolorlabel13-84)
    1567  f499					      endif
    1568  f499		       85 f0		      sta	pfcolortable
    1569  f49b				   .
@@ -2744,7 +2752,7 @@
    1571  f49b
    1572  f49b				   .L010		;  player0color:
    1573  f49b
-   1574  f49b		       a9 80		      LDA	#<playercolorL010_0
+   1574  f49b		       a9 83		      LDA	#<playercolorL010_0
    1575  f49d
    1576  f49d		       85 90		      STA	player0color
    1577  f49f		       a9 f5		      LDA	#>playercolorL010_0
@@ -2755,7 +2763,7 @@
    1582  f4a3
    1583  f4a3				   .L011		;  player1color:
    1584  f4a3
-   1585  f4a3		       a9 88		      LDA	#<playercolorL011_1
+   1585  f4a3		       a9 8b		      LDA	#<playercolorL011_1
    1586  f4a5
    1587  f4a5		       85 87		      STA	player1color
    1588  f4a7		       a9 f5		      LDA	#>playercolorL011_1
@@ -2798,20 +2806,20 @@
    1625  f4e4
    1626  f4e4				   .L015		;  player0:
    1627  f4e4
-   1628  f4e4		       a9 90		      LDA	#<playerL015_0
+   1628  f4e4		       a9 93		      LDA	#<playerL015_0
    1629  f4e6
    1630  f4e6		       85 8a		      STA	player0pointerlo
    1631  f4e8		       a9 f5		      LDA	#>playerL015_0
    1632  f4ea
    1633  f4ea		       85 8b		      STA	player0pointerhi
-   1634  f4ec		       a9 07		      LDA	#7
+   1634  f4ec		       a9 01		      LDA	#1
    1635  f4ee		       85 8e		      STA	player0height
    1636  f4f0				   .
    1637  f4f0							;
    1638  f4f0
    1639  f4f0				   .L016		;  player1:
    1640  f4f0
-   1641  f4f0		       a9 98		      LDA	#<playerL016_1
+   1641  f4f0		       a9 95		      LDA	#<playerL016_1
    1642  f4f2
    1643  f4f2		       85 8c		      STA	player1pointerlo
    1644  f4f4		       a9 f5		      LDA	#>playerL016_1
@@ -2847,359 +2855,343 @@
    1674  f50c				   .
    1675  f50c							;
    1676  f50c
-   1677  f50c				   .L021		;  rem displays the screen
+   1677  f50c				   .L021		;  ballheight	=  0
    1678  f50c
-   1679  f50c				   .draw_loop
-   1680  f50c							; draw_loop
-   1681  f50c
-   1682  f50c				   .L022		;  rem color of background
-   1683  f50c
-   1684  f50c				   .L023		;  COLUBK  =  $9E
-   1685  f50c
-   1686  f50c		       a9 9e		      LDA	#$9E
-   1687  f50e		       85 09		      STA	COLUBK
-   1688  f510				   .L024		;  COLUP0  =  14
-   1689  f510
-   1690  f510		       a9 0e		      LDA	#14
-   1691  f512		       85 06		      STA	COLUP0
-   1692  f514				   .L025		;  COLUP1  =  14
-   1693  f514
-   1694  f514		       a9 0e		      LDA	#14
-   1695  f516		       85 07		      STA	COLUP1
+   1679  f50c		       a9 00		      LDA	#0
+   1680  f50e		       85 92		      STA	ballheight
+   1681  f510				   .L022		;  ballx  =  80
+   1682  f510
+   1683  f510		       a9 50		      LDA	#80
+   1684  f512		       85 84		      STA	ballx
+   1685  f514				   .L023		;  bally  =  70
+   1686  f514
+   1687  f514		       a9 46		      LDA	#70
+   1688  f516		       85 89		      STA	bally
+   1689  f518				   .
+   1690  f518							;
+   1691  f518
+   1692  f518				   .L024		;  dim xDirection  =  1
+   1693  f518
+   1694  f518				   .L025		;  dim yDirection  =  1
+   1695  f518
    1696  f518				   .
    1697  f518							;
    1698  f518
-   1699  f518				   .L026		;  drawscreen
+   1699  f518				   .L026		;  rem displays the screen
    1700  f518
-   1701  f518		       20 ee f3 	      jsr	drawscreen
-   1702  f51b				   .L027		;  if joy0right then player0x	=  player0x  +	1 :  if player0x  >  153 then player0x	=  153
-   1703  f51b
-   1704  f51b		       2c 80 02 	      bit	SWCHA
-   1705  f51e		       30 0c		      BMI	.skipL027
-   1706  f520				   .condpart0
-   1707  f520		       e6 80		      INC	player0x
-   1708  f522		       a9 99		      LDA	#153
-   1709  f524		       c5 80		      CMP	player0x
-   1710  f526		       b0 04		      BCS	.skip0then
-   1711  f528				   .condpart1
-   1712  f528		       a9 99		      LDA	#153
-   1713  f52a		       85 80		      STA	player0x
-   1714  f52c				   .skip0then
-   1715  f52c				   .skipL027
-   1716  f52c				   .L028		;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =	1
-   1717  f52c
-   1718  f52c		       2c 80 02 	      bit	SWCHA
-   1719  f52f		       70 0c		      BVS	.skipL028
-   1720  f531				   .condpart2
-   1721  f531		       c6 80		      DEC	player0x
-   1722  f533		       a5 80		      LDA	player0x
-   1723  f535		       c9 01		      CMP	#1
-   1724  f537		       b0 04		      BCS	.skip2then
-   1725  f539				   .condpart3
-   1726  f539		       a9 01		      LDA	#1
-   1727  f53b		       85 80		      STA	player0x
-   1728  f53d				   .skip2then
-   1729  f53d				   .skipL028
-   1730  f53d				   .L029		;  goto draw_loop
-   1731  f53d
-   1732  f53d		       4c 0c f5 	      jmp	.draw_loop
-   1733  f540
-   1734  f540				  -	      ifconst	pfres
-   1735  f540				  -	      if	(<*) > (254-pfres*pfwidth)
-   1736  f540				  -	      align	256
-   1737  f540				  -	      endif
-   1738  f540				  -	      if	(<*) < (136-pfres*pfwidth)
-   1739  f540				  -	      repeat	((136-pfres*pfwidth)-(<*))
-   1740  f540				  -	      .byte	0
-   1741  f540				  -	      repend
-   1742  f540				  -	      endif
-   1743  f540					      else
-   1744  f540				  -	      if	(<*) > 206
-   1745  f540				  -	      align	256
-   1746  f540					      endif
-   1747  f540					      if	(<*) < 88
-   1748  f540					      repeat	(88-(<*))
-   1749  f540		       00		      .byte.b	0
-   1748  f540					      repend
-   1749  f541		       00		      .byte.b	0
-   1748  f541					      repend
-   1749  f542		       00		      .byte.b	0
-   1748  f542					      repend
-   1749  f543		       00		      .byte.b	0
-   1748  f543					      repend
-   1749  f544		       00		      .byte.b	0
-   1748  f544					      repend
-   1749  f545		       00		      .byte.b	0
-   1748  f545					      repend
-   1749  f546		       00		      .byte.b	0
-   1748  f546					      repend
-   1749  f547		       00		      .byte.b	0
-   1748  f547					      repend
-   1749  f548		       00		      .byte.b	0
-   1748  f548					      repend
-   1749  f549		       00		      .byte.b	0
-   1748  f549					      repend
-   1749  f54a		       00		      .byte.b	0
-   1748  f54a					      repend
-   1749  f54b		       00		      .byte.b	0
-   1748  f54b					      repend
-   1749  f54c		       00		      .byte.b	0
-   1748  f54c					      repend
-   1749  f54d		       00		      .byte.b	0
-   1748  f54d					      repend
-   1749  f54e		       00		      .byte.b	0
-   1748  f54e					      repend
-   1749  f54f		       00		      .byte.b	0
-   1748  f54f					      repend
-   1749  f550		       00		      .byte.b	0
-   1748  f550					      repend
-   1749  f551		       00		      .byte.b	0
-   1748  f551					      repend
-   1749  f552		       00		      .byte.b	0
-   1748  f552					      repend
-   1749  f553		       00		      .byte.b	0
-   1748  f553					      repend
-   1749  f554		       00		      .byte.b	0
-   1748  f554					      repend
-   1749  f555		       00		      .byte.b	0
-   1748  f555					      repend
-   1749  f556		       00		      .byte.b	0
-   1748  f556					      repend
-   1749  f557		       00		      .byte.b	0
-   1750  f558					      repend
-   1751  f558					      endif
-   1752  f558					      endif
-   1753  f558				   pfcolorlabel13
-   1754  f558		       00 00 00 00	      .byte.b	$00,0,0,0
-   1755  f55c		       40 00 00 00	      .byte.b	$40,0,0,0
-   1756  f560		       40 00 00 00	      .byte.b	$40,0,0,0
-   1757  f564		       40 00 00 00	      .byte.b	$40,0,0,0
-   1758  f568		       40 00 00 00	      .byte.b	$40,0,0,0
-   1759  f56c		       40 00 00 00	      .byte.b	$40,0,0,0
-   1760  f570		       40 00 00 00	      .byte.b	$40,0,0,0
-   1761  f574		       00 00 00 00	      .byte.b	$00,0,0,0
-   1762  f578		       00 00 00 00	      .byte.b	$00,0,0,0
-   1763  f57c		       00 00 00 00	      .byte.b	$00,0,0,0
-   1764  f580				  -	      if	(<*) > (<(*+8))
-   1765  f580				  -	      repeat	($100-<*)
-   1766  f580				  -	      .byte	0
-   1767  f580				  -	      repend
-   1768  f580					      endif
-   1769  f580				   playercolorL010_0
-   1770  f580
-   1771  f580		       0e		      .byte.b	$0E
-   1772  f581		       0e		      .byte.b	$0E
-   1773  f582		       0e		      .byte.b	$0E
-   1774  f583		       0e		      .byte.b	$0E
-   1775  f584		       0e		      .byte.b	$0E
-   1776  f585		       0e		      .byte.b	$0E
-   1777  f586		       0e		      .byte.b	$0E
-   1778  f587		       0e		      .byte.b	$0E
-   1779  f588				  -	      if	(<*) > (<(*+8))
-   1780  f588				  -	      repeat	($100-<*)
-   1781  f588				  -	      .byte	0
-   1782  f588				  -	      repend
-   1783  f588					      endif
-   1784  f588				   playercolorL011_1
-   1785  f588
-   1786  f588		       66		      .byte.b	$66
-   1787  f589		       66		      .byte.b	$66
-   1788  f58a		       0e		      .byte.b	$0E
-   1789  f58b		       0e		      .byte.b	$0E
-   1790  f58c		       0e		      .byte.b	$0E
-   1791  f58d		       0e		      .byte.b	$0E
-   1792  f58e		       0e		      .byte.b	$0E
-   1793  f58f		       0e		      .byte.b	$0E
-   1794  f590				  -	      if	(<*) > (<(*+8))
-   1795  f590				  -	      repeat	($100-<*)
-   1796  f590				  -	      .byte	0
-   1797  f590				  -	      repend
-   1798  f590					      endif
-   1799  f590				   playerL015_0
-   1800  f590
-   1801  f590		       ff		      .byte.b	%11111111
-   1802  f591		       ff		      .byte.b	%11111111
-   1803  f592		       00		      .byte.b	%00000000
-   1804  f593		       00		      .byte.b	%00000000
-   1805  f594		       00		      .byte.b	%00000000
-   1806  f595		       00		      .byte.b	%00000000
-   1807  f596		       00		      .byte.b	%00000000
-   1808  f597		       00		      .byte.b	%00000000
-   1809  f598				  -	      if	(<*) > (<(*+8))
-   1810  f598				  -	      repeat	($100-<*)
-   1811  f598				  -	      .byte	0
-   1812  f598				  -	      repend
-   1813  f598					      endif
-   1814  f598				   playerL016_1
-   1815  f598
-   1816  f598		       7e		      .byte.b	%01111110
-   1817  f599		       ff		      .byte.b	%11111111
-   1818  f59a		       ff		      .byte.b	%11111111
-   1819  f59b		       e7		      .byte.b	%11100111
-   1820  f59c		       ff		      .byte.b	%11111111
-   1821  f59d		       db		      .byte.b	%11011011
-   1822  f59e		       7e		      .byte.b	%01111110
-   1823  f59f		       3c		      .byte.b	%00111100
-      2556 bytes of ROM space left
-   1824  f59f					      echo	"    ",[(scoretable - *)]d , "bytes of ROM space left")
-   1825  f5a0
-   1826  f5a0
-   1827  f5a0
-   1828  f5a0							; feel free to modify the score graphics - just keep each digit 8 high
-   1829  f5a0							; and keep the conditional compilation stuff intact
-   1830  f5a0				  -	      ifconst	ROM2k
-   1831  f5a0				  -	      ORG	$F7AC
-   1832  f5a0					      else
-   1833  f5a0				  -	      ifconst	bankswitch
-   1834  f5a0				  -	      if	bankswitch == 8
-   1835  f5a0				  -	      ORG	$2F94-bscode_length
-   1836  f5a0				  -	      RORG	$FF94-bscode_length
-   1837  f5a0				  -	      endif
-   1838  f5a0				  -	      if	bankswitch == 16
-   1839  f5a0				  -	      ORG	$4F94-bscode_length
-   1840  f5a0				  -	      RORG	$FF94-bscode_length
-   1841  f5a0				  -	      endif
-   1842  f5a0				  -	      if	bankswitch == 32
-   1843  f5a0				  -	      ORG	$8F94-bscode_length
-   1844  f5a0				  -	      RORG	$FF94-bscode_length
-   1845  f5a0				  -	      endif
-   1846  f5a0					      else
-   1847  ff9c					      ORG	$FF9C
-   1848  ff9c					      endif
-   1849  ff9c					      endif
-   1850  ff9c
-   1851  ff9c
-   1852  ff9c				   scoretable
-   1853  ff9c		       3c		      .byte.b	%00111100
-   1854  ff9d		       66		      .byte.b	%01100110
-   1855  ff9e		       66		      .byte.b	%01100110
-   1856  ff9f		       66		      .byte.b	%01100110
-   1857  ffa0		       66		      .byte.b	%01100110
-   1858  ffa1		       66		      .byte.b	%01100110
-   1859  ffa2		       66		      .byte.b	%01100110
-   1860  ffa3		       3c		      .byte.b	%00111100
-   1861  ffa4
-   1862  ffa4		       7e		      .byte.b	%01111110
-   1863  ffa5		       18		      .byte.b	%00011000
-   1864  ffa6		       18		      .byte.b	%00011000
-   1865  ffa7		       18		      .byte.b	%00011000
-   1866  ffa8		       18		      .byte.b	%00011000
-   1867  ffa9		       38		      .byte.b	%00111000
-   1868  ffaa		       18		      .byte.b	%00011000
-   1869  ffab		       08		      .byte.b	%00001000
-   1870  ffac
-   1871  ffac		       7e		      .byte.b	%01111110
-   1872  ffad		       60		      .byte.b	%01100000
-   1873  ffae		       60		      .byte.b	%01100000
-   1874  ffaf		       3c		      .byte.b	%00111100
-   1875  ffb0		       06		      .byte.b	%00000110
-   1876  ffb1		       06		      .byte.b	%00000110
-   1877  ffb2		       46		      .byte.b	%01000110
-   1878  ffb3		       3c		      .byte.b	%00111100
-   1879  ffb4
-   1880  ffb4		       3c		      .byte.b	%00111100
-   1881  ffb5		       46		      .byte.b	%01000110
-   1882  ffb6		       06		      .byte.b	%00000110
-   1883  ffb7		       06		      .byte.b	%00000110
-   1884  ffb8		       1c		      .byte.b	%00011100
-   1885  ffb9		       06		      .byte.b	%00000110
-   1886  ffba		       46		      .byte.b	%01000110
-   1887  ffbb		       3c		      .byte.b	%00111100
-   1888  ffbc
-   1889  ffbc		       0c		      .byte.b	%00001100
-   1890  ffbd		       0c		      .byte.b	%00001100
-   1891  ffbe		       7e		      .byte.b	%01111110
-   1892  ffbf		       4c		      .byte.b	%01001100
-   1893  ffc0		       4c		      .byte.b	%01001100
-   1894  ffc1		       2c		      .byte.b	%00101100
-   1895  ffc2		       1c		      .byte.b	%00011100
-   1896  ffc3		       0c		      .byte.b	%00001100
-   1897  ffc4
-   1898  ffc4		       3c		      .byte.b	%00111100
-   1899  ffc5		       46		      .byte.b	%01000110
-   1900  ffc6		       06		      .byte.b	%00000110
-   1901  ffc7		       06		      .byte.b	%00000110
-   1902  ffc8		       3c		      .byte.b	%00111100
-   1903  ffc9		       60		      .byte.b	%01100000
-   1904  ffca		       60		      .byte.b	%01100000
-   1905  ffcb		       7e		      .byte.b	%01111110
-   1906  ffcc
-   1907  ffcc		       3c		      .byte.b	%00111100
-   1908  ffcd		       66		      .byte.b	%01100110
-   1909  ffce		       66		      .byte.b	%01100110
-   1910  ffcf		       66		      .byte.b	%01100110
-   1911  ffd0		       7c		      .byte.b	%01111100
-   1912  ffd1		       60		      .byte.b	%01100000
-   1913  ffd2		       62		      .byte.b	%01100010
-   1914  ffd3		       3c		      .byte.b	%00111100
-   1915  ffd4
-   1916  ffd4		       30		      .byte.b	%00110000
-   1917  ffd5		       30		      .byte.b	%00110000
-   1918  ffd6		       30		      .byte.b	%00110000
-   1919  ffd7		       18		      .byte.b	%00011000
-   1920  ffd8		       0c		      .byte.b	%00001100
-   1921  ffd9		       06		      .byte.b	%00000110
-   1922  ffda		       42		      .byte.b	%01000010
-   1923  ffdb		       3e		      .byte.b	%00111110
-   1924  ffdc
-   1925  ffdc		       3c		      .byte.b	%00111100
-   1926  ffdd		       66		      .byte.b	%01100110
-   1927  ffde		       66		      .byte.b	%01100110
-   1928  ffdf		       66		      .byte.b	%01100110
-   1929  ffe0		       3c		      .byte.b	%00111100
-   1930  ffe1		       66		      .byte.b	%01100110
-   1931  ffe2		       66		      .byte.b	%01100110
-   1932  ffe3		       3c		      .byte.b	%00111100
-   1933  ffe4
-   1934  ffe4		       3c		      .byte.b	%00111100
-   1935  ffe5		       46		      .byte.b	%01000110
-   1936  ffe6		       06		      .byte.b	%00000110
-   1937  ffe7		       3e		      .byte.b	%00111110
-   1938  ffe8		       66		      .byte.b	%01100110
-   1939  ffe9		       66		      .byte.b	%01100110
-   1940  ffea		       66		      .byte.b	%01100110
-   1941  ffeb		       3c		      .byte.b	%00111100
-   1942  ffec
-   1943  ffec
-   1944  ffec				  -	      ifconst	ROM2k
-   1945  ffec				  -	      ORG	$F7FC
-   1946  ffec					      else
-   1947  ffec				  -	      ifconst	bankswitch
-   1948  ffec				  -	      if	bankswitch == 8
-   1949  ffec				  -	      ORG	$2FF4-bscode_length
-   1950  ffec				  -	      RORG	$FFF4-bscode_length
-   1951  ffec				  -	      endif
-   1952  ffec				  -	      if	bankswitch == 16
-   1953  ffec				  -	      ORG	$4FF4-bscode_length
-   1954  ffec				  -	      RORG	$FFF4-bscode_length
-   1955  ffec				  -	      endif
-   1956  ffec				  -	      if	bankswitch == 32
-   1957  ffec				  -	      ORG	$8FF4-bscode_length
-   1958  ffec				  -	      RORG	$FFF4-bscode_length
-   1959  ffec				  -	      endif
-   1960  ffec					      else
-   1961  fffc					      ORG	$FFFC
-   1962  fffc					      endif
-   1963  fffc					      endif
-   1964  fffc				  -	      ifconst	bankswitch
-   1965  fffc				  -	      if	bankswitch == 8
-   1966  fffc				  -	      ORG	$2FFC
-   1967  fffc				  -	      RORG	$FFFC
-   1968  fffc				  -	      endif
-   1969  fffc				  -	      if	bankswitch == 16
-   1970  fffc				  -	      ORG	$4FFC
-   1971  fffc				  -	      RORG	$FFFC
-   1972  fffc				  -	      endif
-   1973  fffc				  -	      if	bankswitch == 32
-   1974  fffc				  -	      ORG	$8FFC
-   1975  fffc				  -	      RORG	$FFFC
-   1976  fffc				  -	      endif
-   1977  fffc					      else
-   1978  fffc				  -	      ifconst	ROM2k
-   1979  fffc				  -	      ORG	$F7FC
-   1980  fffc					      else
-   1981  fffc					      ORG	$FFFC
-   1982  fffc					      endif
-   1983  fffc					      endif
-   1984  fffc		       4e f2		      .word.w	start
-   1985  fffe		       4e f2		      .word.w	start
+   1701  f518				   .draw_loop
+   1702  f518							; draw_loop
+   1703  f518
+   1704  f518				   .L027		;  rem color of background
+   1705  f518
+   1706  f518				   .L028		;  COLUBK  =  $9E
+   1707  f518
+   1708  f518		       a9 9e		      LDA	#$9E
+   1709  f51a		       85 09		      STA	COLUBK
+   1710  f51c				   .L029		;  COLUP0  =  14
+   1711  f51c
+   1712  f51c		       a9 0e		      LDA	#14
+   1713  f51e		       85 06		      STA	COLUP0
+   1714  f520				   .L030		;  COLUP1  =  14
+   1715  f520
+   1716  f520		       a9 0e		      LDA	#14
+   1717  f522		       85 07		      STA	COLUP1
+   1718  f524				   .
+   1719  f524							;
+   1720  f524
+   1721  f524				   .L031		;  drawscreen
+   1722  f524
+   1723  f524		       20 ee f3 	      jsr	drawscreen
+   1724  f527				   .L032		;  bally  =  bally  +	yDirection
+   1725  f527
+   1726  f527		       a5 89		      LDA	bally
+   1727  f529		       18		      CLC
+   1728  f52a		       65 01		      ADC	yDirection
+   1729  f52c		       85 89		      STA	bally
+   1730  f52e				   .L033		;  if collision(ball,player0) then yDirection	=   - 1
+   1731  f52e
+   1732  f52e		       24 02		      BIT	CXP0FB
+   1733  f530		       50 04		      BVC	.skipL033
+   1734  f532				   .condpart0
+   1735  f532		       a9 ff		      LDA	#255
+   1736  f534		       85 01		      STA	yDirection
+   1737  f536				   .skipL033
+   1738  f536				   .L034		;  if joy0right then player0x	=  player0x  +	1 :  if player0x  >  153 then player0x	=  153
+   1739  f536
+   1740  f536		       2c 80 02 	      bit	SWCHA
+   1741  f539		       30 0c		      BMI	.skipL034
+   1742  f53b				   .condpart1
+   1743  f53b		       e6 80		      INC	player0x
+   1744  f53d		       a9 99		      LDA	#153
+   1745  f53f		       c5 80		      CMP	player0x
+   1746  f541		       b0 04		      BCS	.skip1then
+   1747  f543				   .condpart2
+   1748  f543		       a9 99		      LDA	#153
+   1749  f545		       85 80		      STA	player0x
+   1750  f547				   .skip1then
+   1751  f547				   .skipL034
+   1752  f547				   .L035		;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =	1
+   1753  f547
+   1754  f547		       2c 80 02 	      bit	SWCHA
+   1755  f54a		       70 0c		      BVS	.skipL035
+   1756  f54c				   .condpart3
+   1757  f54c		       c6 80		      DEC	player0x
+   1758  f54e		       a5 80		      LDA	player0x
+   1759  f550		       c9 01		      CMP	#1
+   1760  f552		       b0 04		      BCS	.skip3then
+   1761  f554				   .condpart4
+   1762  f554		       a9 01		      LDA	#1
+   1763  f556		       85 80		      STA	player0x
+   1764  f558				   .skip3then
+   1765  f558				   .skipL035
+   1766  f558				   .L036		;  goto draw_loop
+   1767  f558
+   1768  f558		       4c 18 f5 	      jmp	.draw_loop
+   1769  f55b
+   1770  f55b				  -	      ifconst	pfres
+   1771  f55b				  -	      if	(<*) > (254-pfres*pfwidth)
+   1772  f55b				  -	      align	256
+   1773  f55b				  -	      endif
+   1774  f55b				  -	      if	(<*) < (136-pfres*pfwidth)
+   1775  f55b				  -	      repeat	((136-pfres*pfwidth)-(<*))
+   1776  f55b				  -	      .byte	0
+   1777  f55b				  -	      repend
+   1778  f55b				  -	      endif
+   1779  f55b					      else
+   1780  f55b				  -	      if	(<*) > 206
+   1781  f55b				  -	      align	256
+   1782  f55b					      endif
+   1783  f55b				  -	      if	(<*) < 88
+   1784  f55b				  -	      repeat	(88-(<*))
+   1785  f55b				  -	      .byte	0
+   1786  f55b				  -	      repend
+   1787  f55b					      endif
+   1788  f55b					      endif
+   1789  f55b				   pfcolorlabel13
+   1790  f55b		       00 00 00 00	      .byte.b	$00,0,0,0
+   1791  f55f		       40 00 00 00	      .byte.b	$40,0,0,0
+   1792  f563		       40 00 00 00	      .byte.b	$40,0,0,0
+   1793  f567		       40 00 00 00	      .byte.b	$40,0,0,0
+   1794  f56b		       40 00 00 00	      .byte.b	$40,0,0,0
+   1795  f56f		       40 00 00 00	      .byte.b	$40,0,0,0
+   1796  f573		       40 00 00 00	      .byte.b	$40,0,0,0
+   1797  f577		       00 00 00 00	      .byte.b	$00,0,0,0
+   1798  f57b		       00 00 00 00	      .byte.b	$00,0,0,0
+   1799  f57f		       00 00 00 00	      .byte.b	$00,0,0,0
+   1800  f583				  -	      if	(<*) > (<(*+8))
+   1801  f583				  -	      repeat	($100-<*)
+   1802  f583				  -	      .byte	0
+   1803  f583				  -	      repend
+   1804  f583					      endif
+   1805  f583				   playercolorL010_0
+   1806  f583
+   1807  f583		       0e		      .byte.b	$0E
+   1808  f584		       0e		      .byte.b	$0E
+   1809  f585		       0e		      .byte.b	$0E
+   1810  f586		       0e		      .byte.b	$0E
+   1811  f587		       0e		      .byte.b	$0E
+   1812  f588		       0e		      .byte.b	$0E
+   1813  f589		       0e		      .byte.b	$0E
+   1814  f58a		       0e		      .byte.b	$0E
+   1815  f58b				  -	      if	(<*) > (<(*+8))
+   1816  f58b				  -	      repeat	($100-<*)
+   1817  f58b				  -	      .byte	0
+   1818  f58b				  -	      repend
+   1819  f58b					      endif
+   1820  f58b				   playercolorL011_1
+   1821  f58b
+   1822  f58b		       66		      .byte.b	$66
+   1823  f58c		       66		      .byte.b	$66
+   1824  f58d		       0e		      .byte.b	$0E
+   1825  f58e		       0e		      .byte.b	$0E
+   1826  f58f		       0e		      .byte.b	$0E
+   1827  f590		       0e		      .byte.b	$0E
+   1828  f591		       0e		      .byte.b	$0E
+   1829  f592		       0e		      .byte.b	$0E
+   1830  f593				  -	      if	(<*) > (<(*+2))
+   1831  f593				  -	      repeat	($100-<*)
+   1832  f593				  -	      .byte	0
+   1833  f593				  -	      repend
+   1834  f593					      endif
+   1835  f593				   playerL015_0
+   1836  f593
+   1837  f593		       7f		      .byte.b	%1111111
+   1838  f594		       7f		      .byte.b	%1111111
+   1839  f595				  -	      if	(<*) > (<(*+8))
+   1840  f595				  -	      repeat	($100-<*)
+   1841  f595				  -	      .byte	0
+   1842  f595				  -	      repend
+   1843  f595					      endif
+   1844  f595				   playerL016_1
+   1845  f595
+   1846  f595		       7e		      .byte.b	%01111110
+   1847  f596		       ff		      .byte.b	%11111111
+   1848  f597		       ff		      .byte.b	%11111111
+   1849  f598		       e7		      .byte.b	%11100111
+   1850  f599		       ff		      .byte.b	%11111111
+   1851  f59a		       db		      .byte.b	%11011011
+   1852  f59b		       7e		      .byte.b	%01111110
+   1853  f59c		       3c		      .byte.b	%00111100
+      2559 bytes of ROM space left
+   1854  f59c					      echo	"    ",[(scoretable - *)]d , "bytes of ROM space left")
+   1855  f59d
+   1856  f59d
+   1857  f59d
+   1858  f59d							; feel free to modify the score graphics - just keep each digit 8 high
+   1859  f59d							; and keep the conditional compilation stuff intact
+   1860  f59d				  -	      ifconst	ROM2k
+   1861  f59d				  -	      ORG	$F7AC
+   1862  f59d					      else
+   1863  f59d				  -	      ifconst	bankswitch
+   1864  f59d				  -	      if	bankswitch == 8
+   1865  f59d				  -	      ORG	$2F94-bscode_length
+   1866  f59d				  -	      RORG	$FF94-bscode_length
+   1867  f59d				  -	      endif
+   1868  f59d				  -	      if	bankswitch == 16
+   1869  f59d				  -	      ORG	$4F94-bscode_length
+   1870  f59d				  -	      RORG	$FF94-bscode_length
+   1871  f59d				  -	      endif
+   1872  f59d				  -	      if	bankswitch == 32
+   1873  f59d				  -	      ORG	$8F94-bscode_length
+   1874  f59d				  -	      RORG	$FF94-bscode_length
+   1875  f59d				  -	      endif
+   1876  f59d					      else
+   1877  ff9c					      ORG	$FF9C
+   1878  ff9c					      endif
+   1879  ff9c					      endif
+   1880  ff9c
+   1881  ff9c
+   1882  ff9c				   scoretable
+   1883  ff9c		       3c		      .byte.b	%00111100
+   1884  ff9d		       66		      .byte.b	%01100110
+   1885  ff9e		       66		      .byte.b	%01100110
+   1886  ff9f		       66		      .byte.b	%01100110
+   1887  ffa0		       66		      .byte.b	%01100110
+   1888  ffa1		       66		      .byte.b	%01100110
+   1889  ffa2		       66		      .byte.b	%01100110
+   1890  ffa3		       3c		      .byte.b	%00111100
+   1891  ffa4
+   1892  ffa4		       7e		      .byte.b	%01111110
+   1893  ffa5		       18		      .byte.b	%00011000
+   1894  ffa6		       18		      .byte.b	%00011000
+   1895  ffa7		       18		      .byte.b	%00011000
+   1896  ffa8		       18		      .byte.b	%00011000
+   1897  ffa9		       38		      .byte.b	%00111000
+   1898  ffaa		       18		      .byte.b	%00011000
+   1899  ffab		       08		      .byte.b	%00001000
+   1900  ffac
+   1901  ffac		       7e		      .byte.b	%01111110
+   1902  ffad		       60		      .byte.b	%01100000
+   1903  ffae		       60		      .byte.b	%01100000
+   1904  ffaf		       3c		      .byte.b	%00111100
+   1905  ffb0		       06		      .byte.b	%00000110
+   1906  ffb1		       06		      .byte.b	%00000110
+   1907  ffb2		       46		      .byte.b	%01000110
+   1908  ffb3		       3c		      .byte.b	%00111100
+   1909  ffb4
+   1910  ffb4		       3c		      .byte.b	%00111100
+   1911  ffb5		       46		      .byte.b	%01000110
+   1912  ffb6		       06		      .byte.b	%00000110
+   1913  ffb7		       06		      .byte.b	%00000110
+   1914  ffb8		       1c		      .byte.b	%00011100
+   1915  ffb9		       06		      .byte.b	%00000110
+   1916  ffba		       46		      .byte.b	%01000110
+   1917  ffbb		       3c		      .byte.b	%00111100
+   1918  ffbc
+   1919  ffbc		       0c		      .byte.b	%00001100
+   1920  ffbd		       0c		      .byte.b	%00001100
+   1921  ffbe		       7e		      .byte.b	%01111110
+   1922  ffbf		       4c		      .byte.b	%01001100
+   1923  ffc0		       4c		      .byte.b	%01001100
+   1924  ffc1		       2c		      .byte.b	%00101100
+   1925  ffc2		       1c		      .byte.b	%00011100
+   1926  ffc3		       0c		      .byte.b	%00001100
+   1927  ffc4
+   1928  ffc4		       3c		      .byte.b	%00111100
+   1929  ffc5		       46		      .byte.b	%01000110
+   1930  ffc6		       06		      .byte.b	%00000110
+   1931  ffc7		       06		      .byte.b	%00000110
+   1932  ffc8		       3c		      .byte.b	%00111100
+   1933  ffc9		       60		      .byte.b	%01100000
+   1934  ffca		       60		      .byte.b	%01100000
+   1935  ffcb		       7e		      .byte.b	%01111110
+   1936  ffcc
+   1937  ffcc		       3c		      .byte.b	%00111100
+   1938  ffcd		       66		      .byte.b	%01100110
+   1939  ffce		       66		      .byte.b	%01100110
+   1940  ffcf		       66		      .byte.b	%01100110
+   1941  ffd0		       7c		      .byte.b	%01111100
+   1942  ffd1		       60		      .byte.b	%01100000
+   1943  ffd2		       62		      .byte.b	%01100010
+   1944  ffd3		       3c		      .byte.b	%00111100
+   1945  ffd4
+   1946  ffd4		       30		      .byte.b	%00110000
+   1947  ffd5		       30		      .byte.b	%00110000
+   1948  ffd6		       30		      .byte.b	%00110000
+   1949  ffd7		       18		      .byte.b	%00011000
+   1950  ffd8		       0c		      .byte.b	%00001100
+   1951  ffd9		       06		      .byte.b	%00000110
+   1952  ffda		       42		      .byte.b	%01000010
+   1953  ffdb		       3e		      .byte.b	%00111110
+   1954  ffdc
+   1955  ffdc		       3c		      .byte.b	%00111100
+   1956  ffdd		       66		      .byte.b	%01100110
+   1957  ffde		       66		      .byte.b	%01100110
+   1958  ffdf		       66		      .byte.b	%01100110
+   1959  ffe0		       3c		      .byte.b	%00111100
+   1960  ffe1		       66		      .byte.b	%01100110
+   1961  ffe2		       66		      .byte.b	%01100110
+   1962  ffe3		       3c		      .byte.b	%00111100
+   1963  ffe4
+   1964  ffe4		       3c		      .byte.b	%00111100
+   1965  ffe5		       46		      .byte.b	%01000110
+   1966  ffe6		       06		      .byte.b	%00000110
+   1967  ffe7		       3e		      .byte.b	%00111110
+   1968  ffe8		       66		      .byte.b	%01100110
+   1969  ffe9		       66		      .byte.b	%01100110
+   1970  ffea		       66		      .byte.b	%01100110
+   1971  ffeb		       3c		      .byte.b	%00111100
+   1972  ffec
+   1973  ffec
+   1974  ffec				  -	      ifconst	ROM2k
+   1975  ffec				  -	      ORG	$F7FC
+   1976  ffec					      else
+   1977  ffec				  -	      ifconst	bankswitch
+   1978  ffec				  -	      if	bankswitch == 8
+   1979  ffec				  -	      ORG	$2FF4-bscode_length
+   1980  ffec				  -	      RORG	$FFF4-bscode_length
+   1981  ffec				  -	      endif
+   1982  ffec				  -	      if	bankswitch == 16
+   1983  ffec				  -	      ORG	$4FF4-bscode_length
+   1984  ffec				  -	      RORG	$FFF4-bscode_length
+   1985  ffec				  -	      endif
+   1986  ffec				  -	      if	bankswitch == 32
+   1987  ffec				  -	      ORG	$8FF4-bscode_length
+   1988  ffec				  -	      RORG	$FFF4-bscode_length
+   1989  ffec				  -	      endif
+   1990  ffec					      else
+   1991  fffc					      ORG	$FFFC
+   1992  fffc					      endif
+   1993  fffc					      endif
+   1994  fffc				  -	      ifconst	bankswitch
+   1995  fffc				  -	      if	bankswitch == 8
+   1996  fffc				  -	      ORG	$2FFC
+   1997  fffc				  -	      RORG	$FFFC
+   1998  fffc				  -	      endif
+   1999  fffc				  -	      if	bankswitch == 16
+   2000  fffc				  -	      ORG	$4FFC
+   2001  fffc				  -	      RORG	$FFFC
+   2002  fffc				  -	      endif
+   2003  fffc				  -	      if	bankswitch == 32
+   2004  fffc				  -	      ORG	$8FFC
+   2005  fffc				  -	      RORG	$FFFC
+   2006  fffc				  -	      endif
+   2007  fffc					      else
+   2008  fffc				  -	      ifconst	ROM2k
+   2009  fffc				  -	      ORG	$F7FC
+   2010  fffc					      else
+   2011  fffc					      ORG	$FFFC
+   2012  fffc					      endif
+   2013  fffc					      endif
+   2014  fffc		       4e f2		      .word.w	start
+   2015  fffe		       4e f2		      .word.w	start

@@ -1631,7 +1631,7 @@ pflabel0
 	LDA #>playerL015_0
 
 	STA player0pointerhi
-	LDA #7
+	LDA #1
 	STA player0height
 .
  ; 
@@ -1674,60 +1674,96 @@ pflabel0
 .
  ; 
 
-.L021 ;  rem displays the screen
+.L021 ;  ballheight  =  0
+
+	LDA #0
+	STA ballheight
+.L022 ;  ballx  =  80
+
+	LDA #80
+	STA ballx
+.L023 ;  bally  =  70
+
+	LDA #70
+	STA bally
+.
+ ; 
+
+.L024 ;  dim xDirection  =  1
+
+.L025 ;  dim yDirection  =  1
+
+.
+ ; 
+
+.L026 ;  rem displays the screen
 
 .draw_loop
  ; draw_loop
 
-.L022 ;  rem color of background
+.L027 ;  rem color of background
 
-.L023 ;  COLUBK  =  $9E
+.L028 ;  COLUBK  =  $9E
 
 	LDA #$9E
 	STA COLUBK
-.L024 ;  COLUP0  =  14
+.L029 ;  COLUP0  =  14
 
 	LDA #14
 	STA COLUP0
-.L025 ;  COLUP1  =  14
+.L030 ;  COLUP1  =  14
 
 	LDA #14
 	STA COLUP1
 .
  ; 
 
-.L026 ;  drawscreen
+.L031 ;  drawscreen
 
  jsr drawscreen
-.L027 ;  if joy0right then player0x  =  player0x  +  1 :  if player0x  >  153 then player0x  =  153
+.L032 ;  bally  =  bally  +  yDirection
+
+	LDA bally
+	CLC
+	ADC yDirection
+	STA bally
+.L033 ;  if collision(ball,player0) then yDirection  =   - 1
+
+	BIT CXP0FB
+	BVC .skipL033
+.condpart0
+	LDA #255
+	STA yDirection
+.skipL033
+.L034 ;  if joy0right then player0x  =  player0x  +  1 :  if player0x  >  153 then player0x  =  153
 
  bit SWCHA
-	BMI .skipL027
-.condpart0
+	BMI .skipL034
+.condpart1
 	INC player0x
 	LDA #153
 	CMP player0x
-     BCS .skip0then
-.condpart1
+     BCS .skip1then
+.condpart2
 	LDA #153
 	STA player0x
-.skip0then
-.skipL027
-.L028 ;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =  1
+.skip1then
+.skipL034
+.L035 ;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =  1
 
  bit SWCHA
-	BVS .skipL028
-.condpart2
+	BVS .skipL035
+.condpart3
 	DEC player0x
 	LDA player0x
 	CMP #1
-     BCS .skip2then
-.condpart3
+     BCS .skip3then
+.condpart4
 	LDA #1
 	STA player0x
-.skip2then
-.skipL028
-.L029 ;  goto draw_loop
+.skip3then
+.skipL035
+.L036 ;  goto draw_loop
 
  jmp .draw_loop
 
@@ -1791,21 +1827,15 @@ playercolorL011_1
 	.byte  $0E
 	.byte  $0E
 	.byte  $0E
- if (<*) > (<(*+8))
+ if (<*) > (<(*+2))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
 playerL015_0
 
-	.byte  %11111111
-	.byte  %11111111
-	.byte  %00000000
-	.byte  %00000000
-	.byte  %00000000
-	.byte  %00000000
-	.byte  %00000000
-	.byte  %00000000
+	.byte   %1111111
+	.byte   %1111111
  if (<*) > (<(*+8))
 	repeat ($100-<*)
 	.byte 0
