@@ -1580,12 +1580,20 @@ game
 .
  ; 
 
+.L011 ;  player1color:
+
+	LDA #<playercolorL011_1
+
+	STA player1color
+	LDA #>playercolorL011_1
+
+	STA player1color+1
 .
  ; 
 
-.L011 ;  rem drawing the playfield
+.L012 ;  rem drawing the playfield
 
-.L012 ;  playfield:
+.L013 ;  playfield:
 
   ifconst pfres
 	  ldx #(11>pfres)*(pfres*pfwidth-1)+(11<=pfres)*43
@@ -1613,14 +1621,14 @@ pflabel0
 .
  ; 
 
-.L013 ;  rem defining the player
+.L014 ;  rem defining the player
 
-.L014 ;  player0:
+.L015 ;  player0:
 
-	LDA #<playerL014_0
+	LDA #<playerL015_0
 
 	STA player0pointerlo
-	LDA #>playerL014_0
+	LDA #>playerL015_0
 
 	STA player0pointerhi
 	LDA #7
@@ -1628,39 +1636,73 @@ pflabel0
 .
  ; 
 
-.L015 ;  player0x  =  75
+.L016 ;  player1:
+
+	LDA #<playerL016_1
+
+	STA player1pointerlo
+	LDA #>playerL016_1
+
+	STA player1pointerhi
+	LDA #7
+	STA player1height
+.
+ ; 
+
+.
+ ; 
+
+.L017 ;  player0x  =  75
 
 	LDA #75
 	STA player0x
-.L016 ;  player0y  = 88
+.L018 ;  player0y  = 88
 
 	LDA #88
 	STA player0y
 .
  ; 
 
-.L017 ;  rem displays the screen
+.L019 ;  player1x  =  30
+
+	LDA #30
+	STA player1x
+.L020 ;  player1y  =  16
+
+	LDA #16
+	STA player1y
+.
+ ; 
+
+.L021 ;  rem displays the screen
 
 .draw_loop
  ; draw_loop
 
-.L018 ;  rem color of background
+.L022 ;  rem color of background
 
-.L019 ;  COLUBK  =  $9E
+.L023 ;  COLUBK  =  $9E
 
 	LDA #$9E
 	STA COLUBK
-.L020 ;  COLUP0  =  14
+.L024 ;  COLUP0  =  14
 
 	LDA #14
 	STA COLUP0
-.L021 ;  drawscreen
+.L025 ;  COLUP1  =  14
+
+	LDA #14
+	STA COLUP1
+.
+ ; 
+
+.L026 ;  drawscreen
 
  jsr drawscreen
-.L022 ;  if joy0right then player0x  =  player0x  +  1 :  if player0x  >  153 then player0x  =  153
+.L027 ;  if joy0right then player0x  =  player0x  +  1 :  if player0x  >  153 then player0x  =  153
 
  bit SWCHA
-	BMI .skipL022
+	BMI .skipL027
 .condpart0
 	INC player0x
 	LDA #153
@@ -1670,11 +1712,11 @@ pflabel0
 	LDA #153
 	STA player0x
 .skip0then
-.skipL022
-.L023 ;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =  1
+.skipL027
+.L028 ;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =  1
 
  bit SWCHA
-	BVS .skipL023
+	BVS .skipL028
 .condpart2
 	DEC player0x
 	LDA player0x
@@ -1684,8 +1726,8 @@ pflabel0
 	LDA #1
 	STA player0x
 .skip2then
-.skipL023
-.L024 ;  goto draw_loop
+.skipL028
+.L029 ;  goto draw_loop
 
  jmp .draw_loop
 
@@ -1739,7 +1781,22 @@ playercolorL010_0
 	.byte 0
 	repend
 	endif
-playerL014_0
+playercolorL011_1
+
+	.byte  $66
+	.byte  $66
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+	.byte  $0E
+ if (<*) > (<(*+8))
+	repeat ($100-<*)
+	.byte 0
+	repend
+	endif
+playerL015_0
 
 	.byte  %11111111
 	.byte  %11111111
@@ -1749,6 +1806,21 @@ playerL014_0
 	.byte  %00000000
 	.byte  %00000000
 	.byte  %00000000
+ if (<*) > (<(*+8))
+	repeat ($100-<*)
+	.byte 0
+	repend
+	endif
+playerL016_1
+
+	.byte  %01111110
+	.byte  %11111111
+	.byte  %11111111
+	.byte  %11100111
+	.byte  %11111111
+	.byte  %11011011
+	.byte  %01111110
+	.byte  %00111100
        echo "    ",[(scoretable - *)]d , "bytes of ROM space left")
  
  
