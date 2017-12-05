@@ -77,19 +77,23 @@ end
  %00111100
 end
 
+ dim xDirection = 1
+ dim yDirection = 1
 
+ dim missile0dx = a
+ dim missile0dy = b
+
+startgame
  player0x = 75
  player0y =88
 
  player1x = 30
  player1y = 16
 
- ballheight = 0
- ballx = 80
- bally = 70
-
- dim xDirection = 1
- dim yDirection = 1
+ missile0x=80
+ missile0y=70
+ missile0dx = 0
+ missile0dy = 0
 
  rem displays the screen
 draw_loop
@@ -99,8 +103,25 @@ draw_loop
  COLUP1 = 14
 
  drawscreen
- bally = bally + yDirection
- if collision(ball, player0) then yDirection = -1
+ if joy0fire && missile0dx = 0 then gosub startball0
  if joy0right then player0x = player0x + 1: if player0x > 153 then player0x = 153
- if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 1
+ if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 2
+ missile0y = missile0y + missile0dy
+ rem PADDLE COLLISIONS
+ if collision(player0, missile0) then gosub collidep0b0
+
  goto draw_loop
+
+collidep0b0
+ z = player0y - missile0y
+ z = z/4
+ if z >= 2 then missile0dy = #-1
+ if z <= 1 then missile0dy = 1
+ missile0dx = 1
+ missile0x = missile0x + missile0dx
+ missile0y = missile0y + missile0dy
+ return
+
+startball0
+ missile0dy = #1
+ return
