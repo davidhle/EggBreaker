@@ -80,8 +80,8 @@ end
 
  dim missile0dx = a
  dim missile0dy = b
- dim tempx = c
- dim tempy = d
+ dim pixelX = c
+ dim pixelY = d
 
 startgame
  player0x = 75
@@ -122,15 +122,15 @@ draw_loop
  goto draw_loop
 
 pixelcollide0
- rem tempy=(missile0y)/2
- rem tempx = missile0x
- pfpixel tempx tempy off
+ pixelX = missile0x%31
+ pixelY = missile0y%11
+ pfpixel pixelX pixelY off
  if missile0dx < 0 then missile0dx = 1
  if missile0dy = 1 then missile0dy = #-1 else missile0dx = 1
  rem missile0dy = #-missile0dy
 return
 
-collidep0b0
+collidep0b0 
  if missile0dx <= 0 then missile0dx = 1: if missile0dx > 0 then missile0dx = -1
  missile0dy = -1
  return

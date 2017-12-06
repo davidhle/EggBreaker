@@ -1658,9 +1658,9 @@ pflabel0
 
 .L020 ;  dim missile0dy  =  b
 
-.L021 ;  dim tempx  =  c
+.L021 ;  dim pixelX  =  c
 
-.L022 ;  dim tempy  =  d
+.L022 ;  dim pixelY  =  d
 
 .
  ; 
@@ -1874,14 +1874,18 @@ pflabel0
 .pixelcollide0
  ; pixelcollide0
 
-.L051 ;  rem tempy=(missile0y)/2
+.L051 ;  pixelX  =  missile0x%31
 
-.L052 ;  rem tempx = missile0x
+	LDA missile0x%31
+	STA pixelX
+.L052 ;  pixelY  =  missile0y%11
 
-.L053 ;  pfpixel tempx tempy off
+	LDA missile0y%11
+	STA pixelY
+.L053 ;  pfpixel pixelX pixelY off
 
-	LDA tempx
-	LDY tempy
+	LDA pixelX
+	LDY pixelY
 	LDX #1
  jsr pfpixel
 .L054 ;  if missile0dx  <  0 then missile0dx  =  1
