@@ -49,12 +49,10 @@ end
  playfield:
  ................................
  ................................
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XX0XX0XX0XX0XX0XX0XX0XX0XX0XX0XX
+ XX0XX0XX0XX0XX0XX0XX0XX0XX0XX0XX
+ XX0XX0XX0XX0XX0XX0XX0XX0XX0XX0XX
+ XX0XX0XX0XX0XX0XX0XX0XX0XX0XX0XX
  ................................
  ................................
   ................................
@@ -110,6 +108,7 @@ draw_loop
  if joy0right then player0x = player0x + 1: if player0x > 153 then player0x = 153: xDirection = 1
  if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 2: xDirection = -1
  missile0y = missile0y + missile0dy
+ missile0x = missile0x + missile0dy
  rem PADDLE COLLISIONS
  if collision(player0, missile0) then gosub collidep0b0
  if missile0y <=01 then missile0dy=-missile0dy
@@ -121,24 +120,26 @@ draw_loop
  goto draw_loop
 
 pixelcollide0
- tempy=(missile0y)/16
- tempx = missile0x
+ rem tempy=(missile0y)/2
+ rem tempx = missile0x
  pfpixel tempx tempy off
  rem if missile0dx = #-1 then missile0dx = 1
  if missile0dy = 1 then missile0dy = #-1 else missile0dx = 1
  rem missile0dy = #-missile0dy
+ if missile0y >= 88 then goto startgame
 return
 
 collidep0b0
- z = player0y - missile0y
+ z = player0x - missile0x
  z = z/4
- if z >= 2 then missile0dy = #-1
- if z <= 1 then missile0dy = 1
+ if z >= 2 then missile0dx = #-1
+ if z <= 1 then missile0dx = 1
  missile0dy = -1
  missile0x = missile0x + missile0dx
  missile0y = missile0y + missile0dy
  return
 
 startball0
- missile0dy = #1
+ missile0dy = 1
+ missile0dx = 0
  return

@@ -1596,20 +1596,18 @@ game
 .L013 ;  playfield:
 
   ifconst pfres
-	  ldx #(11>pfres)*(pfres*pfwidth-1)+(11<=pfres)*43
+	  ldx #(9>pfres)*(pfres*pfwidth-1)+(9<=pfres)*35
   else
-	  ldx #43
+	  ldx #35
   endif
 	jmp pflabel0
 PF_data0
 	.byte %00000000, %00000000, %00000000, %00000000
 	.byte %00000000, %00000000, %00000000, %00000000
-	.byte %11111111, %11111111, %11111111, %11111111
-	.byte %11111111, %11111111, %11111111, %11111111
-	.byte %11111111, %11111111, %11111111, %11111111
-	.byte %11111111, %11111111, %11111111, %11111111
-	.byte %11111111, %11111111, %11111111, %11111111
-	.byte %11111111, %11111111, %11111111, %11111111
+	.byte %11011011, %10110110, %10110110, %11011011
+	.byte %11011011, %10110110, %10110110, %11011011
+	.byte %11011011, %10110110, %10110110, %11011011
+	.byte %11011011, %10110110, %10110110, %11011011
 	.byte %00000000, %00000000, %00000000, %00000000
 	.byte %00000000, %00000000, %00000000, %00000000
 	.byte %00000000, %00000000, %00000000, %00000000
@@ -1791,35 +1789,41 @@ pflabel0
 	CLC
 	ADC missile0dy
 	STA missile0y
-.L042 ;  rem PADDLE COLLISIONS
+.L042 ;  missile0x  =  missile0x  +  missile0dy
 
-.L043 ;  if collision(player0,missile0) then gosub collidep0b0
+	LDA missile0x
+	CLC
+	ADC missile0dy
+	STA missile0x
+.L043 ;  rem PADDLE COLLISIONS
+
+.L044 ;  if collision(player0,missile0) then gosub collidep0b0
 
 	BIT CXM0P
-	BVC .skipL043
+	BVC .skipL044
 .condpart6
  jsr .collidep0b0
 
-.skipL043
-.L044 ;  if missile0y  <= 01 then missile0dy =  - missile0dy
+.skipL044
+.L045 ;  if missile0y  <= 01 then missile0dy =  - missile0dy
 
 	LDA #01
 	CMP missile0y
-     BCC .skipL044
+     BCC .skipL045
 .condpart7
 	LDA #0
 	SEC
 	SBC missile0dy
 	STA missile0dy
-.skipL044
-.L045 ;  if collision(missile0,playfield) then gosub pixelcollide0
+.skipL045
+.L046 ;  if collision(missile0,playfield) then gosub pixelcollide0
 
 	BIT CXM0FB
-	BPL .skipL045
+	BPL .skipL046
 .condpart8
  jsr .pixelcollide0
 
-.skipL045
+.skipL046
 .
  ; 
 
@@ -1832,7 +1836,7 @@ pflabel0
 .
  ; 
 
-.L046 ;  goto draw_loop
+.L047 ;  goto draw_loop
 
  jmp .draw_loop
 
@@ -1842,44 +1846,44 @@ pflabel0
 .pixelcollide0
  ; pixelcollide0
 
-.L047 ;  tempy =  ( missile0y )  / 16
+.L048 ;  rem tempy=(missile0y)/2
 
-; complex statement detected
-	LDA missile0y
-	lsr
-	lsr
-	lsr
-	lsr
-	STA tempy
-.L048 ;  tempx  =  missile0x
+.L049 ;  rem tempx = missile0x
 
-	LDA missile0x
-	STA tempx
-.L049 ;  pfpixel tempx tempy off
+.L050 ;  pfpixel tempx tempy off
 
 	LDA tempx
 	LDY tempy
 	LDX #1
  jsr pfpixel
-.L050 ;  rem if missile0dx = #-1 then missile0dx = 1
+.L051 ;  rem if missile0dx = #-1 then missile0dx = 1
 
-.L051 ;  if missile0dy  =  1 then missile0dy  =  # - 1 else missile0dx  =  1
+.L052 ;  if missile0dy  =  1 then missile0dy  =  # - 1 else missile0dx  =  1
 
 	LDA missile0dy
 	CMP #1
-     BNE .skipL051
+     BNE .skipL052
 .condpart9
 	LDA ##
 	SEC
 	SBC #1
 	STA missile0dy
  jmp .skipelse0
-.skipL051
+.skipL052
 	LDA #1
 	STA missile0dx
 .skipelse0
-.L052 ;  rem missile0dy = #-missile0dy
+.L053 ;  rem missile0dy = #-missile0dy
 
+.L054 ;  if missile0y  >=  88 then goto startgame
+
+	LDA missile0y
+	CMP #88
+     BCC .skipL054
+.condpart10
+ jmp .startgame
+
+.skipL054
 .return
  ; return
 
@@ -1889,55 +1893,55 @@ pflabel0
 .collidep0b0
  ; collidep0b0
 
-.L053 ;  z  =  player0y  -  missile0y
+.L055 ;  z  =  player0x  -  missile0x
 
-	LDA player0y
+	LDA player0x
 	SEC
-	SBC missile0y
+	SBC missile0x
 	STA z
-.L054 ;  z  =  z / 4
+.L056 ;  z  =  z / 4
 
 	LDA z
 	lsr
 	lsr
 	STA z
-.L055 ;  if z  >=  2 then missile0dy  =  # - 1
+.L057 ;  if z  >=  2 then missile0dx  =  # - 1
 
 	LDA z
 	CMP #2
-     BCC .skipL055
-.condpart10
+     BCC .skipL057
+.condpart11
 	LDA ##
 	SEC
 	SBC #1
-	STA missile0dy
-.skipL055
-.L056 ;  if z  <=  1 then missile0dy  =  1
+	STA missile0dx
+.skipL057
+.L058 ;  if z  <=  1 then missile0dx  =  1
 
 	LDA #1
 	CMP z
-     BCC .skipL056
-.condpart11
+     BCC .skipL058
+.condpart12
 	LDA #1
-	STA missile0dy
-.skipL056
-.L057 ;  missile0dy  =   - 1
+	STA missile0dx
+.skipL058
+.L059 ;  missile0dy  =   - 1
 
 	LDA #255
 	STA missile0dy
-.L058 ;  missile0x  =  missile0x  +  missile0dx
+.L060 ;  missile0x  =  missile0x  +  missile0dx
 
 	LDA missile0x
 	CLC
 	ADC missile0dx
 	STA missile0x
-.L059 ;  missile0y  =  missile0y  +  missile0dy
+.L061 ;  missile0y  =  missile0y  +  missile0dy
 
 	LDA missile0y
 	CLC
 	ADC missile0dy
 	STA missile0y
-.L060 ;  return
+.L062 ;  return
 
 	RTS
 .
@@ -1946,11 +1950,15 @@ pflabel0
 .startball0
  ; startball0
 
-.L061 ;  missile0dy  =  #1
+.L063 ;  missile0dy  =  1
 
-	LDA ##1
+	LDA #1
 	STA missile0dy
-.L062 ;  return
+.L064 ;  missile0dx  =  0
+
+	LDA #0
+	STA missile0dx
+.L065 ;  return
 	RTS
  ifconst pfres
  if (<*) > (254-pfres*pfwidth)
