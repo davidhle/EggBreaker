@@ -711,19 +711,31 @@
       0  10000 ????				       include	"2600basic_variable_redefs.h"
       1  10000 ????						; This file contains variable mapping and other information for the current project.
       2  10000 ????
-      3  10000 ????		00 d9	    pixelY     =	d
+      3  10000 ????		00 e1	    randCountDown =	l
       4  10000 ????
-      5  10000 ????		00 d8	    pixelX     =	c
+      5  10000 ????		00 e0	    soundTimer =	k
       6  10000 ????
-      7  10000 ????		00 d7	    missile0dy =	b
+      7  10000 ????		00 df	    musicDist  =	j
       8  10000 ????
-      9  10000 ????		00 d6	    missile0dx =	a
+      9  10000 ????		00 de	    tempaudv   =	i
      10  10000 ????
-     11  10000 ????		00 01	    yDirection =	1
+     11  10000 ????		00 dd	    musicTimer =	h
      12  10000 ????
-     13  10000 ????		00 01	    xDirection =	1
+     13  10000 ????		00 dc	    musicPointer =	g
      14  10000 ????
-     15  10000 ????		00 01	    PFcolors   =	1
+     15  10000 ????		00 db	    tempy      =	f
+     16  10000 ????
+     17  10000 ????		00 da	    tempx      =	e
+     18  10000 ????
+     19  10000 ????		00 d9	    missile1dy =	d
+     20  10000 ????
+     21  10000 ????		00 d8	    missile1dx =	c
+     22  10000 ????
+     23  10000 ????		00 d7	    missile0dy =	b
+     24  10000 ????
+     25  10000 ????		00 d6	    missile0dx =	a
+     26  10000 ????
+     27  10000 ????		00 00	    legacy     =	0
 ------- FILE 2600basic.h
       5  10000 ????
       6  10000 ????		00 80	    player0x   =	$80
@@ -959,19 +971,31 @@
       0  10000 ????				       include	"2600basic_variable_redefs.h"
       1  10000 ????						; This file contains variable mapping and other information for the current project.
       2  10000 ????
-      3  10000 ????		00 d9	    pixelY     =	d
+      3  10000 ????		00 e1	    randCountDown =	l
       4  10000 ????
-      5  10000 ????		00 d8	    pixelX     =	c
+      5  10000 ????		00 e0	    soundTimer =	k
       6  10000 ????
-      7  10000 ????		00 d7	    missile0dy =	b
+      7  10000 ????		00 df	    musicDist  =	j
       8  10000 ????
-      9  10000 ????		00 d6	    missile0dx =	a
+      9  10000 ????		00 de	    tempaudv   =	i
      10  10000 ????
-     11  10000 ????		00 01	    yDirection =	1
+     11  10000 ????		00 dd	    musicTimer =	h
      12  10000 ????
-     13  10000 ????		00 01	    xDirection =	1
+     13  10000 ????		00 dc	    musicPointer =	g
      14  10000 ????
-     15  10000 ????		00 01	    PFcolors   =	1
+     15  10000 ????		00 db	    tempy      =	f
+     16  10000 ????
+     17  10000 ????		00 da	    tempx      =	e
+     18  10000 ????
+     19  10000 ????		00 d9	    missile1dy =	d
+     20  10000 ????
+     21  10000 ????		00 d8	    missile1dx =	c
+     22  10000 ????
+     23  10000 ????		00 d7	    missile0dy =	b
+     24  10000 ????
+     25  10000 ????		00 d6	    missile0dx =	a
+     26  10000 ????
+     27  10000 ????		00 00	    legacy     =	0
 ------- FILE ..\EggBreaker\EggBreaker.bas.asm
       6  10000 ????			   -	       ifconst	bankswitch
       7  10000 ????			   -	       if	bankswitch == 8
@@ -1322,48 +1346,75 @@
     314  f0bb				  -	      lda	(pfheighttable),y
     315  f0bb				  -	      sta.w	temp1
     316  f0bb					      endif
-    317  f0bb					      ifconst	PFcolors
-    318  f0bb		       a8		      tay
-    319  f0bc		       b1 f0		      lda	(pfcolortable),y
-    320  f0be					      ifnconst	backgroundchange
-    321  f0be		       85 08		      sta	COLUPF
-    322  f0c0				  -	      else
-    323  f0c0				  -	      sta	COLUBK
-    324  f0c0					      endif
-    325  f0c0				  -	      ifconst	pfrowheight
-    326  f0c0				  -	      lda	#pfrowheight
-    327  f0c0					      else
-    328  f0c0					      ifnconst	pfres
-    329  f0c0		       a9 08		      lda	#8
-    330  f0c2				  -	      else
-    331  f0c2				  -	      lda	#(96/pfres)	; try to come close to the real size
-    332  f0c2					      endif
-    333  f0c2					      endif
-    334  f0c2		       85 9c		      sta	temp1
-    335  f0c4					      endif
-    336  f0c4					      ifnconst	PFcolorandheight
-    337  f0c4				  -	      ifnconst	PFcolors
-    338  f0c4				  -	      ifnconst	PFheights
-    339  f0c4				  -	      ifnconst	no_blank_lines
-    340  f0c4				  -			; read paddle 0
-    341  f0c4				  -			; lo-res paddle read
-    342  f0c4				  -			; bit INPT0
-    343  f0c4				  -			; bmi paddleskipread
-    344  f0c4				  -			; inc paddle0
-    345  f0c4				  -			;donepaddleskip
-    346  f0c4				  -	      sleep	10
-    347  f0c4				  -	      ifconst	pfrowheight
-    348  f0c4				  -	      lda	#pfrowheight
-    349  f0c4				  -	      else
-    350  f0c4				  -	      ifnconst	pfres
-    351  f0c4				  -	      lda	#8
-    352  f0c4				  -	      else
-    353  f0c4				  -	      lda	#(96/pfres)	; try to come close to the real size
-    354  f0c4				  -	      endif
-    355  f0c4				  -	      endif
-    356  f0c4				  -	      sta	temp1
-    357  f0c4				  -	      endif
-    358  f0c4				  -	      endif
+    317  f0bb				  -	      ifconst	PFcolors
+    318  f0bb				  -	      tay
+    319  f0bb				  -	      lda	(pfcolortable),y
+    320  f0bb				  -	      ifnconst	backgroundchange
+    321  f0bb				  -	      sta	COLUPF
+    322  f0bb				  -	      else
+    323  f0bb				  -	      sta	COLUBK
+    324  f0bb				  -	      endif
+    325  f0bb				  -	      ifconst	pfrowheight
+    326  f0bb				  -	      lda	#pfrowheight
+    327  f0bb				  -	      else
+    328  f0bb				  -	      ifnconst	pfres
+    329  f0bb				  -	      lda	#8
+    330  f0bb				  -	      else
+    331  f0bb				  -	      lda	#(96/pfres)	; try to come close to the real size
+    332  f0bb				  -	      endif
+    333  f0bb				  -	      endif
+    334  f0bb				  -	      sta	temp1
+    335  f0bb					      endif
+    336  f0bb					      ifnconst	PFcolorandheight
+    337  f0bb					      ifnconst	PFcolors
+    338  f0bb					      ifnconst	PFheights
+    339  f0bb					      ifnconst	no_blank_lines
+    340  f0bb							; read paddle 0
+    341  f0bb							; lo-res paddle read
+    342  f0bb							; bit INPT0
+    343  f0bb							; bmi paddleskipread
+    344  f0bb							; inc paddle0
+    345  f0bb							;donepaddleskip
+      0  f0bb					      sleep	10
+      1  f0bb				   .CYCLES    SET	10
+      2  f0bb
+      3  f0bb				  -	      IF	.CYCLES < 2
+      4  f0bb				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
+      5  f0bb				  -	      ERR
+      6  f0bb					      ENDIF
+      7  f0bb
+      8  f0bb				  -	      IF	.CYCLES & 1
+      9  f0bb				  -	      IFNCONST	NO_ILLEGAL_OPCODES
+     10  f0bb				  -	      nop	0
+     11  f0bb				  -	      ELSE
+     12  f0bb				  -	      bit	VSYNC
+     13  f0bb				  -	      ENDIF
+     14  f0bb				  -.CYCLES    SET	.CYCLES - 3
+     15  f0bb					      ENDIF
+     16  f0bb
+     17  f0bb					      REPEAT	.CYCLES / 2
+     18  f0bb		       ea		      nop
+     17  f0bb					      REPEND
+     18  f0bc		       ea		      nop
+     17  f0bc					      REPEND
+     18  f0bd		       ea		      nop
+     17  f0bd					      REPEND
+     18  f0be		       ea		      nop
+     17  f0be					      REPEND
+     18  f0bf		       ea		      nop
+     19  f0c0					      REPEND
+    347  f0c0				  -	      ifconst	pfrowheight
+    348  f0c0				  -	      lda	#pfrowheight
+    349  f0c0					      else
+    350  f0c0					      ifnconst	pfres
+    351  f0c0		       a9 08		      lda	#8
+    352  f0c2				  -	      else
+    353  f0c2				  -	      lda	#(96/pfres)	; try to come close to the real size
+    354  f0c2					      endif
+    355  f0c2					      endif
+    356  f0c2		       85 9c		      sta	temp1
+    357  f0c4					      endif
+    358  f0c4					      endif
     359  f0c4					      endif
     360  f0c4					      endif
     361  f0c4
@@ -1378,60 +1429,87 @@
     370  f0cd
     371  f0cd					      ifnconst	no_blank_lines
     372  f0cd				   lastkernelline
-    373  f0cd				  -	      ifnconst	PFcolors
-    374  f0cd				  -	      sleep	10
-    375  f0cd					      else
-    376  f0cd		       a0 7c		      ldy	#124
-    377  f0cf		       b1 f0		      lda	(pfcolortable),y
-    378  f0d1		       85 08		      sta	COLUPF
-    379  f0d3					      endif
-    380  f0d3
-    381  f0d3				  -	      ifconst	PFheights
-    382  f0d3				  -	      ldx	#1
-    383  f0d3				  -	      sleep	4
-    384  f0d3					      else
-    385  f0d3		       a6 d5		      ldx	playfieldpos
-      0  f0d5					      sleep	3
-      1  f0d5				   .CYCLES    SET	3
-      2  f0d5
-      3  f0d5				  -	      IF	.CYCLES < 2
-      4  f0d5				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
-      5  f0d5				  -	      ERR
-      6  f0d5					      ENDIF
-      7  f0d5
-      8  f0d5					      IF	.CYCLES & 1
-      9  f0d5					      IFNCONST	NO_ILLEGAL_OPCODES
-     10  f0d5		       04 00		      nop	0
-     11  f0d7				  -	      ELSE
-     12  f0d7				  -	      bit	VSYNC
-     13  f0d7					      ENDIF
-     14  f0d7				   .CYCLES    SET	.CYCLES - 3
-     15  f0d7					      ENDIF
-     16  f0d7
-     17  f0d7				  -	      REPEAT	.CYCLES / 2
-     18  f0d7				  -	      nop
-     19  f0d7					      REPEND
-    387  f0d7					      endif
-    388  f0d7
-    389  f0d7		       4c 1b f1 	      jmp	enterlastkernel
-    390  f0da
-    391  f0da				  -	      else
-    392  f0da				  -lastkernelline
-    393  f0da				  -
-    394  f0da				  -	      ifconst	PFheights
-    395  f0da				  -	      ldx	#1
-    396  f0da				  -	      sleep	5
-    397  f0da				  -	      else
-    398  f0da				  -	      ldx	playfieldpos
-    399  f0da				  -	      sleep	4
-    400  f0da				  -	      endif
-    401  f0da				  -
-    402  f0da				  -	      cpx	#0
-    403  f0da				  -	      bne	.enterfromNBL
-    404  f0da				  -	      jmp	no_blank_lines_bailout
-    405  f0da					      endif
-    406  f0da
-    407  f0da					      if	((<*)>$d5)
+    373  f0cd					      ifnconst	PFcolors
+      0  f0cd					      sleep	10
+      1  f0cd				   .CYCLES    SET	10
+      2  f0cd
+      3  f0cd				  -	      IF	.CYCLES < 2
+      4  f0cd				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
+      5  f0cd				  -	      ERR
+      6  f0cd					      ENDIF
+      7  f0cd
+      8  f0cd				  -	      IF	.CYCLES & 1
+      9  f0cd				  -	      IFNCONST	NO_ILLEGAL_OPCODES
+     10  f0cd				  -	      nop	0
+     11  f0cd				  -	      ELSE
+     12  f0cd				  -	      bit	VSYNC
+     13  f0cd				  -	      ENDIF
+     14  f0cd				  -.CYCLES    SET	.CYCLES - 3
+     15  f0cd					      ENDIF
+     16  f0cd
+     17  f0cd					      REPEAT	.CYCLES / 2
+     18  f0cd		       ea		      nop
+     17  f0cd					      REPEND
+     18  f0ce		       ea		      nop
+     17  f0ce					      REPEND
+     18  f0cf		       ea		      nop
+     17  f0cf					      REPEND
+     18  f0d0		       ea		      nop
+     17  f0d0					      REPEND
+     18  f0d1		       ea		      nop
+     19  f0d2					      REPEND
+    375  f0d2				  -	      else
+    376  f0d2				  -	      ldy	#124
+    377  f0d2				  -	      lda	(pfcolortable),y
+    378  f0d2				  -	      sta	COLUPF
+    379  f0d2					      endif
+    380  f0d2
+    381  f0d2				  -	      ifconst	PFheights
+    382  f0d2				  -	      ldx	#1
+    383  f0d2				  -	      sleep	4
+    384  f0d2					      else
+    385  f0d2		       a6 d5		      ldx	playfieldpos
+      0  f0d4					      sleep	3
+      1  f0d4				   .CYCLES    SET	3
+      2  f0d4
+      3  f0d4				  -	      IF	.CYCLES < 2
+      4  f0d4				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
+      5  f0d4				  -	      ERR
+      6  f0d4					      ENDIF
+      7  f0d4
+      8  f0d4					      IF	.CYCLES & 1
+      9  f0d4					      IFNCONST	NO_ILLEGAL_OPCODES
+     10  f0d4		       04 00		      nop	0
+     11  f0d6				  -	      ELSE
+     12  f0d6				  -	      bit	VSYNC
+     13  f0d6					      ENDIF
+     14  f0d6				   .CYCLES    SET	.CYCLES - 3
+     15  f0d6					      ENDIF
+     16  f0d6
+     17  f0d6				  -	      REPEAT	.CYCLES / 2
+     18  f0d6				  -	      nop
+     19  f0d6					      REPEND
+    387  f0d6					      endif
+    388  f0d6
+    389  f0d6		       4c 1b f1 	      jmp	enterlastkernel
+    390  f0d9
+    391  f0d9				  -	      else
+    392  f0d9				  -lastkernelline
+    393  f0d9				  -
+    394  f0d9				  -	      ifconst	PFheights
+    395  f0d9				  -	      ldx	#1
+    396  f0d9				  -	      sleep	5
+    397  f0d9				  -	      else
+    398  f0d9				  -	      ldx	playfieldpos
+    399  f0d9				  -	      sleep	4
+    400  f0d9				  -	      endif
+    401  f0d9				  -
+    402  f0d9				  -	      cpx	#0
+    403  f0d9				  -	      bne	.enterfromNBL
+    404  f0d9				  -	      jmp	no_blank_lines_bailout
+    405  f0d9					      endif
+    406  f0d9
+    407  f0d9					      if	((<*)>$d5)
     408  f100		       00 00 00 00*	      align	256
     409  f100					      endif
     410  f100							; this is a kludge to prevent page wrapping - fix!!!
@@ -1965,7 +2043,7 @@
     832  f27f					      endif
     833  f27f
     834  f27f					      ifnconst	bankswitch
-    835  f27f		       4c 8f f4 	      jmp	game
+    835  f27f		       4c c8 f4 	      jmp	game
     836  f282				  -	      else
     837  f282				  -	      lda	#>(game-1)
     838  f282				  -	      pha
@@ -2581,1002 +2659,1611 @@
    1403  f407					      endif
    1404  f407		       8d 96 02 	      sta	TIM64T
    1405  f40a
-   1406  f40a				  -	      ifconst	legacy
-   1407  f40a				  -	      if	legacy < 100
-   1408  f40a				  -	      ldx	#4
-   1409  f40a				  -adjustloop
-   1410  f40a				  -	      lda	player0x,x
-   1411  f40a				  -	      sec
-   1412  f40a				  -	      sbc	#14	;?
-   1413  f40a				  -	      sta	player0x,x
-   1414  f40a				  -	      dex
-   1415  f40a				  -	      bpl	adjustloop
-   1416  f40a				  -	      endif
-   1417  f40a					      endif
-   1418  f40a				  -	      if	(<*)>$F0
-   1419  f40a				  -			;align 256, $ea
-   1420  f40a				  -			; the above puts in zeros. Why? replaced by repeat below:
-   1421  f40a				  -	      repeat	($100-(<*))
-   1422  f40a				  -	      nop
-   1423  f40a				  -	      repend
-   1424  f40a					      endif
-   1425  f40a		       85 02		      sta	WSYNC
-   1426  f40c		       a2 04		      ldx	#4
-      0  f40e					      SLEEP	3
-      1  f40e				   .CYCLES    SET	3
-      2  f40e
-      3  f40e				  -	      IF	.CYCLES < 2
-      4  f40e				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
-      5  f40e				  -	      ERR
-      6  f40e					      ENDIF
-      7  f40e
-      8  f40e					      IF	.CYCLES & 1
-      9  f40e					      IFNCONST	NO_ILLEGAL_OPCODES
-     10  f40e		       04 00		      nop	0
-     11  f410				  -	      ELSE
-     12  f410				  -	      bit	VSYNC
-     13  f410					      ENDIF
-     14  f410				   .CYCLES    SET	.CYCLES - 3
-     15  f410					      ENDIF
-     16  f410
-     17  f410				  -	      REPEAT	.CYCLES / 2
-     18  f410				  -	      nop
-     19  f410					      REPEND
-   1428  f410				   HorPosLoop		;     5
-   1429  f410		       b5 80		      lda	player0x,X	;+4   9
-   1430  f412		       38		      sec		;+2  11
-   1431  f413				   DivideLoop
-   1432  f413		       e9 0f		      sbc	#15
-   1433  f415		       b0 fc		      bcs	DivideLoop	;+4  15
-   1434  f417		       95 9c		      sta	temp1,X	;+4  19
-   1435  f419		       95 10		      sta	RESP0,X	;+4  23
-   1436  f41b		       85 02		      sta	WSYNC
-   1437  f41d		       ca		      dex
-   1438  f41e		       10 f0		      bpl	HorPosLoop	;+5   5
-   1439  f420							;     4
-   1440  f420
-   1441  f420		       a2 04		      ldx	#4
-   1442  f422		       b4 9c		      ldy	temp1,X
-   1443  f424		       b9 80 f3 	      lda	repostable-256,Y
-   1444  f427		       95 20		      sta	HMP0,X	;+14 18
-   1445  f429
-   1446  f429		       ca		      dex
-   1447  f42a		       b4 9c		      ldy	temp1,X
-   1448  f42c		       b9 80 f3 	      lda	repostable-256,Y
-   1449  f42f		       95 20		      sta	HMP0,X	;+14 32
-   1450  f431
-   1451  f431		       ca		      dex
-   1452  f432		       b4 9c		      ldy	temp1,X
-   1453  f434		       b9 80 f3 	      lda	repostable-256,Y
-   1454  f437		       95 20		      sta	HMP0,X	;+14 46
-   1455  f439
-   1456  f439		       ca		      dex
-   1457  f43a		       b4 9c		      ldy	temp1,X
-   1458  f43c		       b9 80 f3 	      lda	repostable-256,Y
-   1459  f43f		       95 20		      sta	HMP0,X	;+14 60
-   1460  f441
-   1461  f441		       ca		      dex
-   1462  f442		       b4 9c		      ldy	temp1,X
-   1463  f444		       b9 80 f3 	      lda	repostable-256,Y
-   1464  f447		       95 20		      sta	HMP0,X	;+14 74
-   1465  f449
-   1466  f449		       85 02		      sta	WSYNC
-   1467  f44b
-   1468  f44b		       85 2a		      sta	HMOVE	;+3   3
-   1469  f44d
-   1470  f44d
-   1471  f44d				  -	      ifconst	legacy
-   1472  f44d				  -	      if	legacy < 100
-   1473  f44d				  -	      ldx	#4
-   1474  f44d				  -adjustloop2
-   1475  f44d				  -	      lda	player0x,x
-   1476  f44d				  -	      clc
-   1477  f44d				  -	      adc	#14	;?
-   1478  f44d				  -	      sta	player0x,x
-   1479  f44d				  -	      dex
-   1480  f44d				  -	      bpl	adjustloop2
-   1481  f44d				  -	      endif
-   1482  f44d					      endif
-   1483  f44d
-   1484  f44d
-   1485  f44d
-   1486  f44d
-   1487  f44d							;set score pointers
-   1488  f44d		       a7 95		      lax	score+2
-   1489  f44f		       20 80 f4 	      jsr	scorepointerset
-   1490  f452		       84 9b		      sty	scorepointers+5
-   1491  f454		       86 98		      stx	scorepointers+2
-   1492  f456		       a7 94		      lax	score+1
-   1493  f458		       20 80 f4 	      jsr	scorepointerset
-   1494  f45b		       84 9a		      sty	scorepointers+4
-   1495  f45d		       86 97		      stx	scorepointers+1
-   1496  f45f		       a7 93		      lax	score
-   1497  f461		       20 80 f4 	      jsr	scorepointerset
-   1498  f464		       84 99		      sty	scorepointers+3
-   1499  f466		       86 96		      stx	scorepointers
-   1500  f468
-   1501  f468				   vblk
-   1502  f468							; run possible vblank bB code
-   1503  f468				  -	      ifconst	vblank_bB_code
-   1504  f468				  -	      jsr	vblank_bB_code
-   1505  f468					      endif
-   1506  f468				   vblk2
-   1507  f468		       ad 84 02 	      LDA	INTIM
-   1508  f46b		       30 fb		      bmi	vblk2
-   1509  f46d		       4c 00 f0 	      jmp	kernel
-   1510  f470
-   1511  f470
-   1512  f470		       80 70 60 50*	      .byte.b	$80,$70,$60,$50,$40,$30,$20,$10,$00
-   1513  f479		       f0 e0 d0 c0*	      .byte.b	$F0,$E0,$D0,$C0,$B0,$A0,$90
-   1514  f480				   repostable
-   1515  f480
-   1516  f480				   scorepointerset
-   1517  f480		       29 0f		      and	#$0F
-   1518  f482		       0a		      asl
-   1519  f483		       0a		      asl
-   1520  f484		       0a		      asl
-   1521  f485		       69 9c		      adc	#<scoretable
-   1522  f487		       a8		      tay
-   1523  f488		       8a		      txa
-   1524  f489		       6b f0		      arr	#$F0
-   1525  f48b		       aa		      tax
-   1526  f48c		       cb 64		      sbx	#<(256-<scoretable)
-   1527  f48e		       60		      rts
-   1528  f48f				   game
-   1529  f48f				   .L00 		;  rem **********************************
-   1530  f48f
-   1531  f48f				   .L01 		;  rem Egg Breaker
-   1532  f48f
-   1533  f48f				   .L02 		;  rem LMC 2700
-   1534  f48f
-   1535  f48f				   .L03 		;  rem Project 6
-   1536  f48f
-   1537  f48f				   .L04 		;  rem Lilliann Andrews, Sranee Bayapureddy, David Le
-   1538  f48f
-   1539  f48f				   .L05 		;  rem **********************************
-   1540  f48f
-   1541  f48f				   .
-   1542  f48f							;
-   1543  f48f
-   1544  f48f				   .L06 		;  set romsize 4k
-   1545  f48f
-   1546  f48f				   .L07 		;  set kernel_options pfcolors
-   1547  f48f
-   1548  f48f				   .
-   1549  f48f							;
-   1550  f48f
-   1551  f48f				   .L08 		;  rem setting colors for the playfield's rows
-   1552  f48f
-   1553  f48f				   .L09 		;  pfcolors:
-   1554  f48f
-   1555  f48f		       a9 00		      lda	# $00
-   1556  f491		       85 08		      sta	COLUPF
-   1557  f493				  -	      ifconst	pfres
-   1558  f493				  -	      lda	#>(pfcolorlabel13-132+pfres*pfwidth)
-   1559  f493					      else
-   1560  f493		       a9 f6		      lda	#>(pfcolorlabel13-84)
-   1561  f495					      endif
-   1562  f495		       85 f1		      sta	pfcolortable+1
-   1563  f497				  -	      ifconst	pfres
-   1564  f497				  -	      lda	#<(pfcolorlabel13-132+pfres*pfwidth)
-   1565  f497					      else
-   1566  f497		       a9 04		      lda	#<(pfcolorlabel13-84)
-   1567  f499					      endif
-   1568  f499		       85 f0		      sta	pfcolortable
-   1569  f49b				   .
-   1570  f49b							;
-   1571  f49b
-   1572  f49b				   .L010		;  player0color:
-   1573  f49b
-   1574  f49b		       a9 80		      LDA	#<playercolorL010_0
-   1575  f49d
-   1576  f49d		       85 90		      STA	player0color
-   1577  f49f		       a9 f6		      LDA	#>playercolorL010_0
-   1578  f4a1
-   1579  f4a1		       85 91		      STA	player0color+1
-   1580  f4a3				   .
-   1581  f4a3							;
-   1582  f4a3
-   1583  f4a3				   .L011		;  player1color:
-   1584  f4a3
-   1585  f4a3		       a9 88		      LDA	#<playercolorL011_1
-   1586  f4a5
-   1587  f4a5		       85 87		      STA	player1color
-   1588  f4a7		       a9 f6		      LDA	#>playercolorL011_1
-   1589  f4a9
-   1590  f4a9		       85 88		      STA	player1color+1
-   1591  f4ab				   .
-   1592  f4ab							;
-   1593  f4ab
-   1594  f4ab				   .L012		;  rem drawing the playfield
-   1595  f4ab
-   1596  f4ab				   .L013		;  playfield:
-   1597  f4ab
-   1598  f4ab				  -	      ifconst	pfres
-   1599  f4ab				  -	      ldx	#(9>pfres)*(pfres*pfwidth-1)+(9<=pfres)*35
-   1600  f4ab					      else
-   1601  f4ab		       a2 23		      ldx	#35
-   1602  f4ad					      endif
-   1603  f4ad		       4c d4 f4 	      jmp	pflabel0
-   1604  f4b0				   PF_data0
-   1605  f4b0		       00 00 00 00	      .byte.b	%00000000, %00000000, %00000000, %00000000
-   1606  f4b4		       00 00 00 00	      .byte.b	%00000000, %00000000, %00000000, %00000000
-   1607  f4b8		       db b6 b6 db	      .byte.b	%11011011, %10110110, %10110110, %11011011
-   1608  f4bc		       db b6 b6 db	      .byte.b	%11011011, %10110110, %10110110, %11011011
-   1609  f4c0		       db b6 b6 db	      .byte.b	%11011011, %10110110, %10110110, %11011011
-   1610  f4c4		       db b6 b6 db	      .byte.b	%11011011, %10110110, %10110110, %11011011
-   1611  f4c8		       00 00 00 00	      .byte.b	%00000000, %00000000, %00000000, %00000000
-   1612  f4cc		       00 00 00 00	      .byte.b	%00000000, %00000000, %00000000, %00000000
-   1613  f4d0		       00 00 00 00	      .byte.b	%00000000, %00000000, %00000000, %00000000
-   1614  f4d4				   pflabel0
-   1615  f4d4		       bd b0 f4 	      lda	PF_data0,x
-   1616  f4d7		       95 a4		      sta	playfield,x
-   1617  f4d9		       ca		      dex
-   1618  f4da		       10 f8		      bpl	pflabel0
-   1619  f4dc				   .
-   1620  f4dc							;
-   1621  f4dc
-   1622  f4dc				   .L014		;  rem defining the player
-   1623  f4dc
-   1624  f4dc				   .L015		;  player0:
-   1625  f4dc
-   1626  f4dc		       a9 90		      LDA	#<playerL015_0
-   1627  f4de
-   1628  f4de		       85 8a		      STA	player0pointerlo
-   1629  f4e0		       a9 f6		      LDA	#>playerL015_0
-   1630  f4e2
-   1631  f4e2		       85 8b		      STA	player0pointerhi
-   1632  f4e4		       a9 01		      LDA	#1
-   1633  f4e6		       85 8e		      STA	player0height
-   1634  f4e8				   .
-   1635  f4e8							;
-   1636  f4e8
-   1637  f4e8				   .L016		;  player1:
-   1638  f4e8
-   1639  f4e8		       a9 92		      LDA	#<playerL016_1
-   1640  f4ea
-   1641  f4ea		       85 8c		      STA	player1pointerlo
-   1642  f4ec		       a9 f6		      LDA	#>playerL016_1
-   1643  f4ee
-   1644  f4ee		       85 8d		      STA	player1pointerhi
-   1645  f4f0		       a9 07		      LDA	#7
-   1646  f4f2		       85 8f		      STA	player1height
-   1647  f4f4				   .
-   1648  f4f4							;
-   1649  f4f4
-   1650  f4f4				   .L017		;  dim xDirection  =  1
-   1651  f4f4
-   1652  f4f4				   .L018		;  dim yDirection  =  1
-   1653  f4f4
-   1654  f4f4				   .
-   1655  f4f4							;
-   1656  f4f4
-   1657  f4f4				   .L019		;  dim missile0dx  =  a
-   1658  f4f4
-   1659  f4f4				   .L020		;  dim missile0dy  =  b
-   1660  f4f4
-   1661  f4f4				   .L021		;  dim pixelX	=  c
-   1662  f4f4
-   1663  f4f4				   .L022		;  dim pixelY	=  d
-   1664  f4f4
-   1665  f4f4				   .
-   1666  f4f4							;
-   1667  f4f4
-   1668  f4f4				   .startgame
-   1669  f4f4							; startgame
-   1670  f4f4
-   1671  f4f4				   .L023		;  player0x  =  75
-   1672  f4f4
-   1673  f4f4		       a9 4b		      LDA	#75
-   1674  f4f6		       85 80		      STA	player0x
-   1675  f4f8				   .L024		;  player0y  = 88
-   1676  f4f8
-   1677  f4f8		       a9 58		      LDA	#88
-   1678  f4fa		       85 85		      STA	player0y
-   1679  f4fc				   .
-   1680  f4fc							;
-   1681  f4fc
-   1682  f4fc				   .L025		;  player1x  =  30
-   1683  f4fc
-   1684  f4fc		       a9 1e		      LDA	#30
-   1685  f4fe		       85 81		      STA	player1x
-   1686  f500				   .L026		;  player1y  =  16
-   1687  f500
-   1688  f500		       a9 10		      LDA	#16
-   1689  f502		       85 86		      STA	player1y
-   1690  f504				   .
-   1691  f504							;
-   1692  f504
-   1693  f504				   .L027		;  missile0x = 80
-   1694  f504
-   1695  f504		       a9 50		      LDA	#80
-   1696  f506		       85 82		      STA	missile0x
-   1697  f508				   .L028		;  missile0y = 70
-   1698  f508
-   1699  f508		       a9 46		      LDA	#70
-   1700  f50a		       85 91		      STA	missile0y
-   1701  f50c				   .L029		;  missile0dx	=  0
-   1702  f50c
-   1703  f50c		       a9 00		      LDA	#0
-   1704  f50e		       85 d6		      STA	missile0dx
-   1705  f510				   .L030		;  missile0dy	=  0
-   1706  f510
-   1707  f510		       a9 00		      LDA	#0
-   1708  f512		       85 d7		      STA	missile0dy
-   1709  f514				   .L031		;  missile0height =  1
-   1710  f514
-   1711  f514		       a9 01		      LDA	#1
-   1712  f516		       85 90		      STA	missile0height
-   1713  f518				   .
-   1714  f518							;
-   1715  f518
-   1716  f518				   .L032		;  rem displays the screen
-   1717  f518
-   1718  f518				   .draw_loop
-   1719  f518							; draw_loop
-   1720  f518
-   1721  f518				   .L033		;  rem color of background
-   1722  f518
-   1723  f518				   .L034		;  COLUBK  =  $9E
-   1724  f518
-   1725  f518		       a9 9e		      LDA	#$9E
-   1726  f51a		       85 09		      STA	COLUBK
-   1727  f51c				   .L035		;  COLUP0  =  14
-   1728  f51c
-   1729  f51c		       a9 0e		      LDA	#14
-   1730  f51e		       85 06		      STA	COLUP0
-   1731  f520				   .L036		;  COLUP1  =  14
-   1732  f520
-   1733  f520		       a9 0e		      LDA	#14
-   1734  f522		       85 07		      STA	COLUP1
-   1735  f524				   .
-   1736  f524							;
-   1737  f524
-   1738  f524				   .L037		;  drawscreen
-   1739  f524
-   1740  f524		       20 ee f3 	      jsr	drawscreen
-   1741  f527				   .L038		;  if joy0fire  &&  missile0dx  =  0 then gosub startball0
-   1742  f527
-   1743  f527		       24 0c		      bit	INPT4
-   1744  f529		       30 09		      BMI	.skipL038
-   1745  f52b				   .condpart0
-   1746  f52b		       a5 d6		      LDA	missile0dx
-   1747  f52d		       c9 00		      CMP	#0
-   1748  f52f		       d0 03		      BNE	.skip0then
-   1749  f531				   .condpart1
-   1750  f531		       20 f5 f5 	      jsr	.startball0
-   1751  f534
-   1752  f534				   .skip0then
-   1753  f534				   .skipL038
-   1754  f534				   .L039		;  if joy0right then player0x	=  player0x  +	1 :  if player0x  >  153 then player0x	=  153 :  xDirection  =  1
-   1755  f534
-   1756  f534		       2c 80 02 	      bit	SWCHA
-   1757  f537		       30 10		      BMI	.skipL039
-   1758  f539				   .condpart2
-   1759  f539		       e6 80		      INC	player0x
-   1760  f53b		       a9 99		      LDA	#153
-   1761  f53d		       c5 80		      CMP	player0x
-   1762  f53f		       b0 08		      BCS	.skip2then
-   1763  f541				   .condpart3
-   1764  f541		       a9 99		      LDA	#153
-   1765  f543		       85 80		      STA	player0x
-   1766  f545		       a9 01		      LDA	#1
-   1767  f547		       85 01		      STA	xDirection
-   1768  f549				   .skip2then
-   1769  f549				   .skipL039
-   1770  f549				   .L040		;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =	2 :  xDirection  =   - 1
-   1771  f549
-   1772  f549		       2c 80 02 	      bit	SWCHA
-   1773  f54c		       70 10		      BVS	.skipL040
-   1774  f54e				   .condpart4
-   1775  f54e		       c6 80		      DEC	player0x
-   1776  f550		       a5 80		      LDA	player0x
-   1777  f552		       c9 01		      CMP	#1
-   1778  f554		       b0 08		      BCS	.skip4then
-   1779  f556				   .condpart5
-   1780  f556		       a9 02		      LDA	#2
-   1781  f558		       85 80		      STA	player0x
-   1782  f55a		       a9 ff		      LDA	#255
-   1783  f55c		       85 01		      STA	xDirection
-   1784  f55e				   .skip4then
-   1785  f55e				   .skipL040
-   1786  f55e				   .L041		;  missile0x  =  missile0x  +	missile0dx
-   1787  f55e
-   1788  f55e		       a5 82		      LDA	missile0x
-   1789  f560		       18		      CLC
-   1790  f561		       65 d6		      ADC	missile0dx
-   1791  f563		       85 82		      STA	missile0x
-   1792  f565				   .L042		;  missile0y  =  missile0y  +	missile0dy
-   1793  f565
-   1794  f565		       a5 91		      LDA	missile0y
-   1795  f567		       18		      CLC
-   1796  f568		       65 d7		      ADC	missile0dy
-   1797  f56a		       85 91		      STA	missile0y
-   1798  f56c				   .L043		;  if missile0y  >=  88 then goto startgame
-   1799  f56c
-   1800  f56c		       a5 91		      LDA	missile0y
-   1801  f56e		       c9 58		      CMP	#88
-   1802  f570		       90 03		      BCC	.skipL043
-   1803  f572				   .condpart6
-   1804  f572		       4c f4 f4 	      jmp	.startgame
-   1805  f575
-   1806  f575				   .skipL043
-   1807  f575				   .L044		;  rem COLLISIONS
-   1808  f575
-   1809  f575				   .L045		;  if collision(player0,missile0) then gosub collidep0b0
-   1810  f575
-   1811  f575		       24 00		      BIT	CXM0P
-   1812  f577		       50 03		      BVC	.skipL045
-   1813  f579				   .condpart7
-   1814  f579		       20 dc f5 	      jsr	.collidep0b0
-   1815  f57c
-   1816  f57c				   .skipL045
-   1817  f57c				   .L046		;  if missile0y  <= 01 then missile0dy =  - missile0dy
-   1818  f57c
-   1819  f57c		       a9 01		      LDA	#01
-   1820  f57e		       c5 91		      CMP	missile0y
-   1821  f580		       90 07		      BCC	.skipL046
-   1822  f582				   .condpart8
-   1823  f582		       a9 00		      LDA	#0
-   1824  f584		       38		      SEC
-   1825  f585		       e5 d7		      SBC	missile0dy
-   1826  f587		       85 d7		      STA	missile0dy
-   1827  f589				   .skipL046
-   1828  f589				   .L047		;  if collision(missile0,playfield) then gosub pixelcollide0
-   1829  f589
-   1830  f589		       24 04		      BIT	CXM0FB
-   1831  f58b		       10 03		      BPL	.skipL047
-   1832  f58d				   .condpart9
-   1833  f58d		       20 ad f5 	      jsr	.pixelcollide0
-   1834  f590
-   1835  f590				   .skipL047
-   1836  f590				   .L048		;  if missile0x  <= 1 then missile0dx =  - missile0dx
-   1837  f590
-   1838  f590		       a9 01		      LDA	#1
-   1839  f592		       c5 82		      CMP	missile0x
-   1840  f594		       90 07		      BCC	.skipL048
-   1841  f596				   .condpart10
-   1842  f596		       a9 00		      LDA	#0
-   1843  f598		       38		      SEC
-   1844  f599		       e5 d6		      SBC	missile0dx
-   1845  f59b		       85 d6		      STA	missile0dx
-   1846  f59d				   .skipL048
-   1847  f59d				   .L049		;  if missile0x  >= 153 then missile0dx =  - missile0dx
-   1848  f59d
-   1849  f59d		       a5 82		      LDA	missile0x
-   1850  f59f		       c9 99		      CMP	#153
-   1851  f5a1		       90 07		      BCC	.skipL049
-   1852  f5a3				   .condpart11
-   1853  f5a3		       a9 00		      LDA	#0
-   1854  f5a5		       38		      SEC
-   1855  f5a6		       e5 d6		      SBC	missile0dx
-   1856  f5a8		       85 d6		      STA	missile0dx
-   1857  f5aa				   .skipL049
-   1858  f5aa				   .
-   1859  f5aa							;
-   1860  f5aa
-   1861  f5aa				   .
-   1862  f5aa							;
-   1863  f5aa
-   1864  f5aa				   .
-   1865  f5aa							;
-   1866  f5aa
-   1867  f5aa				   .L050		;  goto draw_loop
-   1868  f5aa
-   1869  f5aa		       4c 18 f5 	      jmp	.draw_loop
-   1870  f5ad
-   1871  f5ad				   .
-   1872  f5ad							;
-   1873  f5ad
-   1874  f5ad				   .pixelcollide0
-   1875  f5ad							; pixelcollide0
-   1876  f5ad
-   1877  f5ad				   .L051		;  pixelX  =  missile0x%31
-   1878  f5ad
-   1879  f5ad		       a5 06		      LDA	missile0x%31
-   1880  f5af		       85 d8		      STA	pixelX
-   1881  f5b1				   .L052		;  pixelY  =  missile0y%11
-   1882  f5b1
-   1883  f5b1		       a5 02		      LDA	missile0y%11
-   1884  f5b3		       85 d9		      STA	pixelY
-   1885  f5b5				   .L053		;  pfpixel pixelX pixelY off
-   1886  f5b5
-   1887  f5b5		       a5 d8		      LDA	pixelX
-   1888  f5b7		       a4 d9		      LDY	pixelY
-   1889  f5b9		       a2 01		      LDX	#1
-   1890  f5bb		       20 a9 f2 	      jsr	pfpixel
-   1891  f5be				   .L054		;  if missile0dx  <  0 then missile0dx  =  1
-   1892  f5be
-   1893  f5be		       a5 d6		      LDA	missile0dx
-   1894  f5c0		       c9 00		      CMP	#0
-   1895  f5c2		       b0 04		      BCS	.skipL054
-   1896  f5c4				   .condpart12
-   1897  f5c4		       a9 01		      LDA	#1
-   1898  f5c6		       85 d6		      STA	missile0dx
-   1899  f5c8				   .skipL054
-   1900  f5c8				   .L055		;  if missile0dy  =  1 then missile0dy  =  # - 1 else missile0dx  =  1
-   1901  f5c8
-   1902  f5c8		       a5 d7		      LDA	missile0dy
-   1903  f5ca		       c9 01		      CMP	#1
-   1904  f5cc		       d0 0a		      BNE	.skipL055
-   1905  f5ce				   .condpart13
-   1906  f5ce		       a9 00		      LDA	##
-   1907  f5d0		       38		      SEC
-   1908  f5d1		       e9 01		      SBC	#1
-   1909  f5d3		       85 d7		      STA	missile0dy
-   1910  f5d5		       4c dc f5 	      jmp	.skipelse0
-   1911  f5d8				   .skipL055
-   1912  f5d8		       a9 01		      LDA	#1
-   1913  f5da		       85 d6		      STA	missile0dx
-   1914  f5dc				   .skipelse0
-   1915  f5dc				   .L056		;  rem missile0dy = #-missile0dy
-   1916  f5dc
-   1917  f5dc				   .return
-   1918  f5dc							; return
-   1919  f5dc
-   1920  f5dc				   .
-   1921  f5dc							;
-   1922  f5dc
-   1923  f5dc				   .collidep0b0
-   1924  f5dc							; collidep0b0
-   1925  f5dc
-   1926  f5dc				   .L057		;  if missile0dx  <=  0 then missile0dx  =  1 :  if missile0dx  >  0 then missile0dx  =   - 1
-   1927  f5dc
-   1928  f5dc		       a9 00		      LDA	#0
-   1929  f5de		       c5 d6		      CMP	missile0dx
-   1930  f5e0		       90 0e		      BCC	.skipL057
-   1931  f5e2				   .condpart14
-   1932  f5e2		       a9 01		      LDA	#1
-   1933  f5e4		       85 d6		      STA	missile0dx
-   1934  f5e6		       a9 00		      LDA	#0
-   1935  f5e8		       c5 d6		      CMP	missile0dx
-   1936  f5ea		       b0 04		      BCS	.skip14then
-   1937  f5ec				   .condpart15
-   1938  f5ec		       a9 ff		      LDA	#255
-   1939  f5ee		       85 d6		      STA	missile0dx
-   1940  f5f0				   .skip14then
-   1941  f5f0				   .skipL057
-   1942  f5f0				   .L058		;  missile0dy	=   - 1
-   1943  f5f0
-   1944  f5f0		       a9 ff		      LDA	#255
-   1945  f5f2		       85 d7		      STA	missile0dy
-   1946  f5f4				   .L059		;  return
-   1947  f5f4
-   1948  f5f4		       60		      RTS
-   1949  f5f5				   .
-   1950  f5f5							;
-   1951  f5f5
-   1952  f5f5				   .startball0
-   1953  f5f5							; startball0
-   1954  f5f5
-   1955  f5f5				   .L060		;  missile0dy	=  1
-   1956  f5f5
-   1957  f5f5		       a9 01		      LDA	#1
-   1958  f5f7		       85 d7		      STA	missile0dy
-   1959  f5f9				   .L061		;  missile0dx	=  0
-   1960  f5f9
-   1961  f5f9		       a9 00		      LDA	#0
-   1962  f5fb		       85 d6		      STA	missile0dx
-   1963  f5fd				   .L062		;  return
-   1964  f5fd		       60		      RTS
-   1965  f5fe				  -	      ifconst	pfres
-   1966  f5fe				  -	      if	(<*) > (254-pfres*pfwidth)
-   1967  f5fe				  -	      align	256
-   1968  f5fe				  -	      endif
-   1969  f5fe				  -	      if	(<*) < (136-pfres*pfwidth)
-   1970  f5fe				  -	      repeat	((136-pfres*pfwidth)-(<*))
-   1971  f5fe				  -	      .byte	0
-   1972  f5fe				  -	      repend
-   1973  f5fe				  -	      endif
-   1974  f5fe					      else
-   1975  f5fe					      if	(<*) > 206
-   1976  f600		       00 00		      align	256
-   1977  f600					      endif
-   1978  f600					      if	(<*) < 88
-   1979  f600					      repeat	(88-(<*))
-   1980  f600		       00		      .byte.b	0
-   1979  f600					      repend
-   1980  f601		       00		      .byte.b	0
-   1979  f601					      repend
-   1980  f602		       00		      .byte.b	0
-   1979  f602					      repend
-   1980  f603		       00		      .byte.b	0
-   1979  f603					      repend
-   1980  f604		       00		      .byte.b	0
-   1979  f604					      repend
-   1980  f605		       00		      .byte.b	0
-   1979  f605					      repend
-   1980  f606		       00		      .byte.b	0
-   1979  f606					      repend
-   1980  f607		       00		      .byte.b	0
-   1979  f607					      repend
-   1980  f608		       00		      .byte.b	0
-   1979  f608					      repend
-   1980  f609		       00		      .byte.b	0
-   1979  f609					      repend
-   1980  f60a		       00		      .byte.b	0
-   1979  f60a					      repend
-   1980  f60b		       00		      .byte.b	0
-   1979  f60b					      repend
-   1980  f60c		       00		      .byte.b	0
-   1979  f60c					      repend
-   1980  f60d		       00		      .byte.b	0
-   1979  f60d					      repend
-   1980  f60e		       00		      .byte.b	0
-   1979  f60e					      repend
-   1980  f60f		       00		      .byte.b	0
-   1979  f60f					      repend
-   1980  f610		       00		      .byte.b	0
-   1979  f610					      repend
-   1980  f611		       00		      .byte.b	0
-   1979  f611					      repend
-   1980  f612		       00		      .byte.b	0
-   1979  f612					      repend
-   1980  f613		       00		      .byte.b	0
-   1979  f613					      repend
-   1980  f614		       00		      .byte.b	0
-   1979  f614					      repend
-   1980  f615		       00		      .byte.b	0
-   1979  f615					      repend
-   1980  f616		       00		      .byte.b	0
-   1979  f616					      repend
-   1980  f617		       00		      .byte.b	0
-   1979  f617					      repend
-   1980  f618		       00		      .byte.b	0
-   1979  f618					      repend
-   1980  f619		       00		      .byte.b	0
-   1979  f619					      repend
-   1980  f61a		       00		      .byte.b	0
-   1979  f61a					      repend
-   1980  f61b		       00		      .byte.b	0
-   1979  f61b					      repend
-   1980  f61c		       00		      .byte.b	0
-   1979  f61c					      repend
-   1980  f61d		       00		      .byte.b	0
-   1979  f61d					      repend
-   1980  f61e		       00		      .byte.b	0
-   1979  f61e					      repend
-   1980  f61f		       00		      .byte.b	0
-   1979  f61f					      repend
-   1980  f620		       00		      .byte.b	0
-   1979  f620					      repend
-   1980  f621		       00		      .byte.b	0
-   1979  f621					      repend
-   1980  f622		       00		      .byte.b	0
-   1979  f622					      repend
-   1980  f623		       00		      .byte.b	0
-   1979  f623					      repend
-   1980  f624		       00		      .byte.b	0
-   1979  f624					      repend
-   1980  f625		       00		      .byte.b	0
-   1979  f625					      repend
-   1980  f626		       00		      .byte.b	0
-   1979  f626					      repend
-   1980  f627		       00		      .byte.b	0
-   1979  f627					      repend
-   1980  f628		       00		      .byte.b	0
-   1979  f628					      repend
-   1980  f629		       00		      .byte.b	0
-   1979  f629					      repend
-   1980  f62a		       00		      .byte.b	0
-   1979  f62a					      repend
-   1980  f62b		       00		      .byte.b	0
-   1979  f62b					      repend
-   1980  f62c		       00		      .byte.b	0
-   1979  f62c					      repend
-   1980  f62d		       00		      .byte.b	0
-   1979  f62d					      repend
-   1980  f62e		       00		      .byte.b	0
-   1979  f62e					      repend
-   1980  f62f		       00		      .byte.b	0
-   1979  f62f					      repend
-   1980  f630		       00		      .byte.b	0
-   1979  f630					      repend
-   1980  f631		       00		      .byte.b	0
-   1979  f631					      repend
-   1980  f632		       00		      .byte.b	0
-   1979  f632					      repend
-   1980  f633		       00		      .byte.b	0
-   1979  f633					      repend
-   1980  f634		       00		      .byte.b	0
-   1979  f634					      repend
-   1980  f635		       00		      .byte.b	0
-   1979  f635					      repend
-   1980  f636		       00		      .byte.b	0
-   1979  f636					      repend
-   1980  f637		       00		      .byte.b	0
-   1979  f637					      repend
-   1980  f638		       00		      .byte.b	0
-   1979  f638					      repend
-   1980  f639		       00		      .byte.b	0
-   1979  f639					      repend
-   1980  f63a		       00		      .byte.b	0
-   1979  f63a					      repend
-   1980  f63b		       00		      .byte.b	0
-   1979  f63b					      repend
-   1980  f63c		       00		      .byte.b	0
-   1979  f63c					      repend
-   1980  f63d		       00		      .byte.b	0
-   1979  f63d					      repend
-   1980  f63e		       00		      .byte.b	0
-   1979  f63e					      repend
-   1980  f63f		       00		      .byte.b	0
-   1979  f63f					      repend
-   1980  f640		       00		      .byte.b	0
-   1979  f640					      repend
-   1980  f641		       00		      .byte.b	0
-   1979  f641					      repend
-   1980  f642		       00		      .byte.b	0
-   1979  f642					      repend
-   1980  f643		       00		      .byte.b	0
-   1979  f643					      repend
-   1980  f644		       00		      .byte.b	0
-   1979  f644					      repend
-   1980  f645		       00		      .byte.b	0
-   1979  f645					      repend
-   1980  f646		       00		      .byte.b	0
-   1979  f646					      repend
-   1980  f647		       00		      .byte.b	0
-   1979  f647					      repend
-   1980  f648		       00		      .byte.b	0
-   1979  f648					      repend
-   1980  f649		       00		      .byte.b	0
-   1979  f649					      repend
-   1980  f64a		       00		      .byte.b	0
-   1979  f64a					      repend
-   1980  f64b		       00		      .byte.b	0
-   1979  f64b					      repend
-   1980  f64c		       00		      .byte.b	0
-   1979  f64c					      repend
-   1980  f64d		       00		      .byte.b	0
-   1979  f64d					      repend
-   1980  f64e		       00		      .byte.b	0
-   1979  f64e					      repend
-   1980  f64f		       00		      .byte.b	0
-   1979  f64f					      repend
-   1980  f650		       00		      .byte.b	0
-   1979  f650					      repend
-   1980  f651		       00		      .byte.b	0
-   1979  f651					      repend
-   1980  f652		       00		      .byte.b	0
-   1979  f652					      repend
-   1980  f653		       00		      .byte.b	0
-   1979  f653					      repend
-   1980  f654		       00		      .byte.b	0
-   1979  f654					      repend
-   1980  f655		       00		      .byte.b	0
-   1979  f655					      repend
-   1980  f656		       00		      .byte.b	0
-   1979  f656					      repend
-   1980  f657		       00		      .byte.b	0
-   1981  f658					      repend
-   1982  f658					      endif
-   1983  f658					      endif
-   1984  f658				   pfcolorlabel13
-   1985  f658		       00 00 00 00	      .byte.b	$00,0,0,0
-   1986  f65c		       40 00 00 00	      .byte.b	$40,0,0,0
-   1987  f660		       40 00 00 00	      .byte.b	$40,0,0,0
-   1988  f664		       40 00 00 00	      .byte.b	$40,0,0,0
-   1989  f668		       40 00 00 00	      .byte.b	$40,0,0,0
-   1990  f66c		       40 00 00 00	      .byte.b	$40,0,0,0
-   1991  f670		       40 00 00 00	      .byte.b	$40,0,0,0
-   1992  f674		       00 00 00 00	      .byte.b	$00,0,0,0
-   1993  f678		       00 00 00 00	      .byte.b	$00,0,0,0
-   1994  f67c		       00 00 00 00	      .byte.b	$00,0,0,0
-   1995  f680				  -	      if	(<*) > (<(*+8))
-   1996  f680				  -	      repeat	($100-<*)
-   1997  f680				  -	      .byte	0
-   1998  f680				  -	      repend
-   1999  f680					      endif
-   2000  f680				   playercolorL010_0
-   2001  f680
-   2002  f680		       0e		      .byte.b	$0E
-   2003  f681		       0e		      .byte.b	$0E
-   2004  f682		       0e		      .byte.b	$0E
-   2005  f683		       0e		      .byte.b	$0E
-   2006  f684		       0e		      .byte.b	$0E
-   2007  f685		       0e		      .byte.b	$0E
-   2008  f686		       0e		      .byte.b	$0E
-   2009  f687		       0e		      .byte.b	$0E
-   2010  f688				  -	      if	(<*) > (<(*+8))
-   2011  f688				  -	      repeat	($100-<*)
-   2012  f688				  -	      .byte	0
-   2013  f688				  -	      repend
-   2014  f688					      endif
-   2015  f688				   playercolorL011_1
-   2016  f688
-   2017  f688		       66		      .byte.b	$66
-   2018  f689		       66		      .byte.b	$66
-   2019  f68a		       0e		      .byte.b	$0E
-   2020  f68b		       0e		      .byte.b	$0E
-   2021  f68c		       0e		      .byte.b	$0E
-   2022  f68d		       0e		      .byte.b	$0E
-   2023  f68e		       0e		      .byte.b	$0E
-   2024  f68f		       0e		      .byte.b	$0E
-   2025  f690				  -	      if	(<*) > (<(*+2))
-   2026  f690				  -	      repeat	($100-<*)
-   2027  f690				  -	      .byte	0
-   2028  f690				  -	      repend
-   2029  f690					      endif
-   2030  f690				   playerL015_0
-   2031  f690
-   2032  f690		       7f		      .byte.b	%1111111
-   2033  f691		       7f		      .byte.b	%1111111
-   2034  f692				  -	      if	(<*) > (<(*+8))
-   2035  f692				  -	      repeat	($100-<*)
-   2036  f692				  -	      .byte	0
-   2037  f692				  -	      repend
-   2038  f692					      endif
-   2039  f692				   playerL016_1
-   2040  f692
-   2041  f692		       7e		      .byte.b	%01111110
-   2042  f693		       ff		      .byte.b	%11111111
-   2043  f694		       ff		      .byte.b	%11111111
-   2044  f695		       e7		      .byte.b	%11100111
-   2045  f696		       ff		      .byte.b	%11111111
-   2046  f697		       db		      .byte.b	%11011011
-   2047  f698		       7e		      .byte.b	%01111110
-   2048  f699		       3c		      .byte.b	%00111100
-      2306 bytes of ROM space left
-   2049  f699					      echo	"    ",[(scoretable - *)]d , "bytes of ROM space left")
-   2050  f69a
-   2051  f69a
-   2052  f69a
-   2053  f69a							; feel free to modify the score graphics - just keep each digit 8 high
-   2054  f69a							; and keep the conditional compilation stuff intact
-   2055  f69a				  -	      ifconst	ROM2k
-   2056  f69a				  -	      ORG	$F7AC
-   2057  f69a					      else
-   2058  f69a				  -	      ifconst	bankswitch
-   2059  f69a				  -	      if	bankswitch == 8
-   2060  f69a				  -	      ORG	$2F94-bscode_length
-   2061  f69a				  -	      RORG	$FF94-bscode_length
-   2062  f69a				  -	      endif
-   2063  f69a				  -	      if	bankswitch == 16
-   2064  f69a				  -	      ORG	$4F94-bscode_length
-   2065  f69a				  -	      RORG	$FF94-bscode_length
-   2066  f69a				  -	      endif
-   2067  f69a				  -	      if	bankswitch == 32
-   2068  f69a				  -	      ORG	$8F94-bscode_length
-   2069  f69a				  -	      RORG	$FF94-bscode_length
-   2070  f69a				  -	      endif
-   2071  f69a					      else
-   2072  ff9c					      ORG	$FF9C
-   2073  ff9c					      endif
-   2074  ff9c					      endif
-   2075  ff9c
-   2076  ff9c
-   2077  ff9c				   scoretable
-   2078  ff9c		       3c		      .byte.b	%00111100
-   2079  ff9d		       66		      .byte.b	%01100110
-   2080  ff9e		       66		      .byte.b	%01100110
-   2081  ff9f		       66		      .byte.b	%01100110
-   2082  ffa0		       66		      .byte.b	%01100110
-   2083  ffa1		       66		      .byte.b	%01100110
-   2084  ffa2		       66		      .byte.b	%01100110
-   2085  ffa3		       3c		      .byte.b	%00111100
-   2086  ffa4
-   2087  ffa4		       7e		      .byte.b	%01111110
-   2088  ffa5		       18		      .byte.b	%00011000
-   2089  ffa6		       18		      .byte.b	%00011000
-   2090  ffa7		       18		      .byte.b	%00011000
-   2091  ffa8		       18		      .byte.b	%00011000
-   2092  ffa9		       38		      .byte.b	%00111000
-   2093  ffaa		       18		      .byte.b	%00011000
-   2094  ffab		       08		      .byte.b	%00001000
-   2095  ffac
-   2096  ffac		       7e		      .byte.b	%01111110
-   2097  ffad		       60		      .byte.b	%01100000
-   2098  ffae		       60		      .byte.b	%01100000
-   2099  ffaf		       3c		      .byte.b	%00111100
-   2100  ffb0		       06		      .byte.b	%00000110
-   2101  ffb1		       06		      .byte.b	%00000110
-   2102  ffb2		       46		      .byte.b	%01000110
-   2103  ffb3		       3c		      .byte.b	%00111100
-   2104  ffb4
-   2105  ffb4		       3c		      .byte.b	%00111100
-   2106  ffb5		       46		      .byte.b	%01000110
-   2107  ffb6		       06		      .byte.b	%00000110
-   2108  ffb7		       06		      .byte.b	%00000110
-   2109  ffb8		       1c		      .byte.b	%00011100
-   2110  ffb9		       06		      .byte.b	%00000110
-   2111  ffba		       46		      .byte.b	%01000110
-   2112  ffbb		       3c		      .byte.b	%00111100
-   2113  ffbc
-   2114  ffbc		       0c		      .byte.b	%00001100
-   2115  ffbd		       0c		      .byte.b	%00001100
-   2116  ffbe		       7e		      .byte.b	%01111110
-   2117  ffbf		       4c		      .byte.b	%01001100
-   2118  ffc0		       4c		      .byte.b	%01001100
-   2119  ffc1		       2c		      .byte.b	%00101100
-   2120  ffc2		       1c		      .byte.b	%00011100
-   2121  ffc3		       0c		      .byte.b	%00001100
-   2122  ffc4
-   2123  ffc4		       3c		      .byte.b	%00111100
-   2124  ffc5		       46		      .byte.b	%01000110
-   2125  ffc6		       06		      .byte.b	%00000110
-   2126  ffc7		       06		      .byte.b	%00000110
-   2127  ffc8		       3c		      .byte.b	%00111100
-   2128  ffc9		       60		      .byte.b	%01100000
-   2129  ffca		       60		      .byte.b	%01100000
-   2130  ffcb		       7e		      .byte.b	%01111110
-   2131  ffcc
-   2132  ffcc		       3c		      .byte.b	%00111100
-   2133  ffcd		       66		      .byte.b	%01100110
-   2134  ffce		       66		      .byte.b	%01100110
-   2135  ffcf		       66		      .byte.b	%01100110
-   2136  ffd0		       7c		      .byte.b	%01111100
-   2137  ffd1		       60		      .byte.b	%01100000
-   2138  ffd2		       62		      .byte.b	%01100010
-   2139  ffd3		       3c		      .byte.b	%00111100
-   2140  ffd4
-   2141  ffd4		       30		      .byte.b	%00110000
-   2142  ffd5		       30		      .byte.b	%00110000
-   2143  ffd6		       30		      .byte.b	%00110000
-   2144  ffd7		       18		      .byte.b	%00011000
-   2145  ffd8		       0c		      .byte.b	%00001100
-   2146  ffd9		       06		      .byte.b	%00000110
-   2147  ffda		       42		      .byte.b	%01000010
-   2148  ffdb		       3e		      .byte.b	%00111110
-   2149  ffdc
-   2150  ffdc		       3c		      .byte.b	%00111100
-   2151  ffdd		       66		      .byte.b	%01100110
-   2152  ffde		       66		      .byte.b	%01100110
-   2153  ffdf		       66		      .byte.b	%01100110
-   2154  ffe0		       3c		      .byte.b	%00111100
-   2155  ffe1		       66		      .byte.b	%01100110
-   2156  ffe2		       66		      .byte.b	%01100110
-   2157  ffe3		       3c		      .byte.b	%00111100
-   2158  ffe4
-   2159  ffe4		       3c		      .byte.b	%00111100
-   2160  ffe5		       46		      .byte.b	%01000110
-   2161  ffe6		       06		      .byte.b	%00000110
-   2162  ffe7		       3e		      .byte.b	%00111110
-   2163  ffe8		       66		      .byte.b	%01100110
-   2164  ffe9		       66		      .byte.b	%01100110
-   2165  ffea		       66		      .byte.b	%01100110
-   2166  ffeb		       3c		      .byte.b	%00111100
-   2167  ffec
-   2168  ffec
-   2169  ffec				  -	      ifconst	ROM2k
-   2170  ffec				  -	      ORG	$F7FC
-   2171  ffec					      else
-   2172  ffec				  -	      ifconst	bankswitch
-   2173  ffec				  -	      if	bankswitch == 8
-   2174  ffec				  -	      ORG	$2FF4-bscode_length
-   2175  ffec				  -	      RORG	$FFF4-bscode_length
-   2176  ffec				  -	      endif
-   2177  ffec				  -	      if	bankswitch == 16
-   2178  ffec				  -	      ORG	$4FF4-bscode_length
-   2179  ffec				  -	      RORG	$FFF4-bscode_length
-   2180  ffec				  -	      endif
-   2181  ffec				  -	      if	bankswitch == 32
-   2182  ffec				  -	      ORG	$8FF4-bscode_length
-   2183  ffec				  -	      RORG	$FFF4-bscode_length
-   2184  ffec				  -	      endif
-   2185  ffec					      else
-   2186  fffc					      ORG	$FFFC
-   2187  fffc					      endif
-   2188  fffc					      endif
-   2189  fffc				  -	      ifconst	bankswitch
-   2190  fffc				  -	      if	bankswitch == 8
-   2191  fffc				  -	      ORG	$2FFC
-   2192  fffc				  -	      RORG	$FFFC
-   2193  fffc				  -	      endif
-   2194  fffc				  -	      if	bankswitch == 16
-   2195  fffc				  -	      ORG	$4FFC
-   2196  fffc				  -	      RORG	$FFFC
-   2197  fffc				  -	      endif
-   2198  fffc				  -	      if	bankswitch == 32
-   2199  fffc				  -	      ORG	$8FFC
-   2200  fffc				  -	      RORG	$FFFC
-   2201  fffc				  -	      endif
-   2202  fffc					      else
-   2203  fffc				  -	      ifconst	ROM2k
-   2204  fffc				  -	      ORG	$F7FC
-   2205  fffc					      else
-   2206  fffc					      ORG	$FFFC
-   2207  fffc					      endif
-   2208  fffc					      endif
-   2209  fffc		       4e f2		      .word.w	start
-   2210  fffe		       4e f2		      .word.w	start
+   1406  f40a					      ifconst	legacy
+   1407  f40a					      if	legacy < 100
+   1408  f40a		       a2 04		      ldx	#4
+   1409  f40c				   adjustloop
+   1410  f40c		       b5 80		      lda	player0x,x
+   1411  f40e		       38		      sec
+   1412  f40f		       e9 0e		      sbc	#14	;?
+   1413  f411		       95 80		      sta	player0x,x
+   1414  f413		       ca		      dex
+   1415  f414		       10 f6		      bpl	adjustloop
+   1416  f416					      endif
+   1417  f416					      endif
+   1418  f416				  -	      if	(<*)>$F0
+   1419  f416				  -			;align 256, $ea
+   1420  f416				  -			; the above puts in zeros. Why? replaced by repeat below:
+   1421  f416				  -	      repeat	($100-(<*))
+   1422  f416				  -	      nop
+   1423  f416				  -	      repend
+   1424  f416					      endif
+   1425  f416		       85 02		      sta	WSYNC
+   1426  f418		       a2 04		      ldx	#4
+      0  f41a					      SLEEP	3
+      1  f41a				   .CYCLES    SET	3
+      2  f41a
+      3  f41a				  -	      IF	.CYCLES < 2
+      4  f41a				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
+      5  f41a				  -	      ERR
+      6  f41a					      ENDIF
+      7  f41a
+      8  f41a					      IF	.CYCLES & 1
+      9  f41a					      IFNCONST	NO_ILLEGAL_OPCODES
+     10  f41a		       04 00		      nop	0
+     11  f41c				  -	      ELSE
+     12  f41c				  -	      bit	VSYNC
+     13  f41c					      ENDIF
+     14  f41c				   .CYCLES    SET	.CYCLES - 3
+     15  f41c					      ENDIF
+     16  f41c
+     17  f41c				  -	      REPEAT	.CYCLES / 2
+     18  f41c				  -	      nop
+     19  f41c					      REPEND
+   1428  f41c				   HorPosLoop		;     5
+   1429  f41c		       b5 80		      lda	player0x,X	;+4   9
+   1430  f41e		       38		      sec		;+2  11
+   1431  f41f				   DivideLoop
+   1432  f41f		       e9 0f		      sbc	#15
+   1433  f421		       b0 fc		      bcs	DivideLoop	;+4  15
+   1434  f423		       95 9c		      sta	temp1,X	;+4  19
+   1435  f425		       95 10		      sta	RESP0,X	;+4  23
+   1436  f427		       85 02		      sta	WSYNC
+   1437  f429		       ca		      dex
+   1438  f42a		       10 f0		      bpl	HorPosLoop	;+5   5
+   1439  f42c							;     4
+   1440  f42c
+   1441  f42c		       a2 04		      ldx	#4
+   1442  f42e		       b4 9c		      ldy	temp1,X
+   1443  f430		       b9 98 f3 	      lda	repostable-256,Y
+   1444  f433		       95 20		      sta	HMP0,X	;+14 18
+   1445  f435
+   1446  f435		       ca		      dex
+   1447  f436		       b4 9c		      ldy	temp1,X
+   1448  f438		       b9 98 f3 	      lda	repostable-256,Y
+   1449  f43b		       95 20		      sta	HMP0,X	;+14 32
+   1450  f43d
+   1451  f43d		       ca		      dex
+   1452  f43e		       b4 9c		      ldy	temp1,X
+   1453  f440		       b9 98 f3 	      lda	repostable-256,Y
+   1454  f443		       95 20		      sta	HMP0,X	;+14 46
+   1455  f445
+   1456  f445		       ca		      dex
+   1457  f446		       b4 9c		      ldy	temp1,X
+   1458  f448		       b9 98 f3 	      lda	repostable-256,Y
+   1459  f44b		       95 20		      sta	HMP0,X	;+14 60
+   1460  f44d
+   1461  f44d		       ca		      dex
+   1462  f44e		       b4 9c		      ldy	temp1,X
+   1463  f450		       b9 98 f3 	      lda	repostable-256,Y
+   1464  f453		       95 20		      sta	HMP0,X	;+14 74
+   1465  f455
+   1466  f455		       85 02		      sta	WSYNC
+   1467  f457
+   1468  f457		       85 2a		      sta	HMOVE	;+3   3
+   1469  f459
+   1470  f459
+   1471  f459					      ifconst	legacy
+   1472  f459					      if	legacy < 100
+   1473  f459		       a2 04		      ldx	#4
+   1474  f45b				   adjustloop2
+   1475  f45b		       b5 80		      lda	player0x,x
+   1476  f45d		       18		      clc
+   1477  f45e		       69 0e		      adc	#14	;?
+   1478  f460		       95 80		      sta	player0x,x
+   1479  f462		       ca		      dex
+   1480  f463		       10 f6		      bpl	adjustloop2
+   1481  f465					      endif
+   1482  f465					      endif
+   1483  f465
+   1484  f465
+   1485  f465
+   1486  f465
+   1487  f465							;set score pointers
+   1488  f465		       a7 95		      lax	score+2
+   1489  f467		       20 98 f4 	      jsr	scorepointerset
+   1490  f46a		       84 9b		      sty	scorepointers+5
+   1491  f46c		       86 98		      stx	scorepointers+2
+   1492  f46e		       a7 94		      lax	score+1
+   1493  f470		       20 98 f4 	      jsr	scorepointerset
+   1494  f473		       84 9a		      sty	scorepointers+4
+   1495  f475		       86 97		      stx	scorepointers+1
+   1496  f477		       a7 93		      lax	score
+   1497  f479		       20 98 f4 	      jsr	scorepointerset
+   1498  f47c		       84 99		      sty	scorepointers+3
+   1499  f47e		       86 96		      stx	scorepointers
+   1500  f480
+   1501  f480				   vblk
+   1502  f480							; run possible vblank bB code
+   1503  f480				  -	      ifconst	vblank_bB_code
+   1504  f480				  -	      jsr	vblank_bB_code
+   1505  f480					      endif
+   1506  f480				   vblk2
+   1507  f480		       ad 84 02 	      LDA	INTIM
+   1508  f483		       30 fb		      bmi	vblk2
+   1509  f485		       4c 00 f0 	      jmp	kernel
+   1510  f488
+   1511  f488
+   1512  f488		       80 70 60 50*	      .byte.b	$80,$70,$60,$50,$40,$30,$20,$10,$00
+   1513  f491		       f0 e0 d0 c0*	      .byte.b	$F0,$E0,$D0,$C0,$B0,$A0,$90
+   1514  f498				   repostable
+   1515  f498
+   1516  f498				   scorepointerset
+   1517  f498		       29 0f		      and	#$0F
+   1518  f49a		       0a		      asl
+   1519  f49b		       0a		      asl
+   1520  f49c		       0a		      asl
+   1521  f49d		       69 9c		      adc	#<scoretable
+   1522  f49f		       a8		      tay
+   1523  f4a0		       8a		      txa
+   1524  f4a1		       6b f0		      arr	#$F0
+   1525  f4a3		       aa		      tax
+   1526  f4a4		       cb 64		      sbx	#<(256-<scoretable)
+   1527  f4a6		       60		      rts
+   1528  f4a7							; y and a contain multiplicands, result in a
+   1529  f4a7
+   1530  f4a7				   mul8
+   1531  f4a7		       84 9c		      sty	temp1
+   1532  f4a9		       85 9d		      sta	temp2
+   1533  f4ab		       a9 00		      lda	#0
+   1534  f4ad				   reptmul8
+   1535  f4ad		       46 9d		      lsr	temp2
+   1536  f4af		       90 03		      bcc	skipmul8
+   1537  f4b1		       18		      clc
+   1538  f4b2		       65 9c		      adc	temp1
+   1539  f4b4							;bcs donemul8 might save cycles?
+   1540  f4b4				   skipmul8
+   1541  f4b4							;beq donemul8 might save cycles?
+   1542  f4b4		       06 9c		      asl	temp1
+   1543  f4b6		       d0 f5		      bne	reptmul8
+   1544  f4b8				   donemul8
+      0  f4b8					      RETURN
+      1  f4b8					      ifnconst	bankswitch
+      2  f4b8		       60		      rts
+      3  f4b9				  -	      else
+      4  f4b9				  -	      jmp	BS_return
+      5  f4b9					      endif
+   1546  f4b9
+   1547  f4b9				   div8
+   1548  f4b9							; a=numerator y=denominator, result in a
+   1549  f4b9		       c0 02		      cpy	#2
+   1550  f4bb		       90 0a		      bcc	div8end+1	;div by 0 = bad, div by 1=no calc needed, so bail out
+   1551  f4bd		       84 9c		      sty	temp1
+   1552  f4bf		       a0 ff		      ldy	#$ff
+   1553  f4c1				   div8loop
+   1554  f4c1		       e5 9c		      sbc	temp1
+   1555  f4c3		       c8		      iny
+   1556  f4c4		       b0 fb		      bcs	div8loop
+   1557  f4c6				   div8end
+   1558  f4c6		       98		      tya
+   1559  f4c7							; result in a
+      0  f4c7					      RETURN
+      1  f4c7					      ifnconst	bankswitch
+      2  f4c7		       60		      rts
+      3  f4c8				  -	      else
+      4  f4c8				  -	      jmp	BS_return
+      5  f4c8					      endif
+   1561  f4c8				   game
+   1562  f4c8				   .L00 		;  rem **********************************
+   1563  f4c8
+   1564  f4c8				   .L01 		;  rem Egg Breaker
+   1565  f4c8
+   1566  f4c8				   .L02 		;  rem
+   1567  f4c8
+   1568  f4c8				   .L03 		;  rem Humpty Dumpty has a neighbor he doesn't like
+   1569  f4c8
+   1570  f4c8				   .L04 		;  rem There's a wall between them like fences for human
+   1571  f4c8
+   1572  f4c8				   .L05 		;  rem  neighbors. Get your ball past them to win a point
+   1573  f4c8
+   1574  f4c8				   .L06 		;  rem  and have your ball hit the other egg to win 10 points
+   1575  f4c8
+   1576  f4c8				   .L07 		;  rem
+   1577  f4c8
+   1578  f4c8				   .L08 		;  rem LMC 2700
+   1579  f4c8
+   1580  f4c8				   .L09 		;  rem Project 6
+   1581  f4c8
+   1582  f4c8				   .L010		;  rem Lilliann Andrews, Sranee Bayapureddy, David Le
+   1583  f4c8
+   1584  f4c8				   .L011		;  rem **********************************
+   1585  f4c8
+   1586  f4c8				   .L012		;  include div_mul.asm
+   1587  f4c8
+   1588  f4c8				   .L013		;  rem include fixed_point_math.asm
+   1589  f4c8
+   1590  f4c8				   .L014		;  set legacy
+   1591  f4c8
+   1592  f4c8				   .L015		;  set romsize 4k
+   1593  f4c8
+   1594  f4c8				   .L016		;  pfclear
+   1595  f4c8
+   1596  f4c8		       a9 00		      LDA	#0
+   1597  f4ca		       20 82 f2 	      jsr	pfclear
+   1598  f4cd				   .L017		;  player0x = 2 : player0y = 52
+   1599  f4cd
+   1600  f4cd		       a9 02		      LDA	#2
+   1601  f4cf		       85 80		      STA	player0x
+   1602  f4d1		       a9 34		      LDA	#52
+   1603  f4d3		       85 85		      STA	player0y
+   1604  f4d5				   .L018		;  player0:
+   1605  f4d5
+   1606  f4d5		       a9 5d		      LDA	#<playerL018_0
+   1607  f4d7
+   1608  f4d7		       85 8a		      STA	player0pointerlo
+   1609  f4d9		       a9 f9		      LDA	#>playerL018_0
+   1610  f4db
+   1611  f4db		       85 8b		      STA	player0pointerhi
+   1612  f4dd		       a9 09		      LDA	#9
+   1613  f4df		       85 8e		      STA	player0height
+   1614  f4e1				   .L019		;  player1x = 158 : player1y = 52
+   1615  f4e1
+   1616  f4e1		       a9 9e		      LDA	#158
+   1617  f4e3		       85 81		      STA	player1x
+   1618  f4e5		       a9 34		      LDA	#52
+   1619  f4e7		       85 86		      STA	player1y
+   1620  f4e9				   .L020		;  player1:
+   1621  f4e9
+   1622  f4e9		       a9 67		      LDA	#<playerL020_1
+   1623  f4eb
+   1624  f4eb		       85 8c		      STA	player1pointerlo
+   1625  f4ed		       a9 f9		      LDA	#>playerL020_1
+   1626  f4ef
+   1627  f4ef		       85 8d		      STA	player1pointerhi
+   1628  f4f1		       a9 09		      LDA	#9
+   1629  f4f3		       85 8f		      STA	player1height
+   1630  f4f5				   .
+   1631  f4f5							;
+   1632  f4f5
+   1633  f4f5				   .L021		;  scorecolor	=  60
+   1634  f4f5
+   1635  f4f5		       a9 3c		      LDA	#60
+   1636  f4f7		       85 a3		      STA	scorecolor
+   1637  f4f9				   .L022		;  dim missile0dx  =  a
+   1638  f4f9
+   1639  f4f9				   .L023		;  dim missile0dy  =  b
+   1640  f4f9
+   1641  f4f9				   .L024		;  dim missile1dx  =  c
+   1642  f4f9
+   1643  f4f9				   .L025		;  dim missile1dy  =  d
+   1644  f4f9
+   1645  f4f9				   .L026		;  dim tempx  =  e
+   1646  f4f9
+   1647  f4f9				   .L027		;  dim tempy  =  f
+   1648  f4f9
+   1649  f4f9				   .L028		;  dim musicPointer  =  g
+   1650  f4f9
+   1651  f4f9				   .L029		;  dim musicTimer  =  h
+   1652  f4f9
+   1653  f4f9				   .L030		;  dim tempaudv  =  i
+   1654  f4f9
+   1655  f4f9				   .L031		;  dim musicDist  =  j
+   1656  f4f9
+   1657  f4f9				   .L032		;  dim soundTimer  =  k
+   1658  f4f9
+   1659  f4f9				   .L033		;  dim randCountDown  =  l
+   1660  f4f9
+   1661  f4f9				   .L034		;  randCountDown  =  30
+   1662  f4f9
+   1663  f4f9		       a9 1e		      LDA	#30
+   1664  f4fb		       85 e1		      STA	randCountDown
+   1665  f4fd				   .L035		;  musicPointer = $FF
+   1666  f4fd
+   1667  f4fd		       a9 ff		      LDA	#$FF
+   1668  f4ff		       85 dc		      STA	musicPointer
+   1669  f501				   .L036		;  musicTimer = 0
+   1670  f501
+   1671  f501		       a9 00		      LDA	#0
+   1672  f503		       85 dd		      STA	musicTimer
+   1673  f505				   .L037		;  AUDV0 = 0
+   1674  f505
+   1675  f505		       a9 00		      LDA	#0
+   1676  f507		       85 19		      STA	AUDV0
+   1677  f509				   .L038		;  AUDC0 = 4
+   1678  f509
+   1679  f509		       a9 04		      LDA	#4
+   1680  f50b		       85 15		      STA	AUDC0
+   1681  f50d				   .L039		;  AUDV1 = 0
+   1682  f50d
+   1683  f50d		       a9 00		      LDA	#0
+   1684  f50f		       85 1a		      STA	AUDV1
+   1685  f511				   .L040		;  AUDC1 = 14
+   1686  f511
+   1687  f511		       a9 0e		      LDA	#14
+   1688  f513		       85 16		      STA	AUDC1
+   1689  f515				   .
+   1690  f515							;
+   1691  f515
+   1692  f515				   .startgame
+   1693  f515							; startgame
+   1694  f515
+   1695  f515				   .L041		;  player0x = 2 : player0y = 52
+   1696  f515
+   1697  f515		       a9 02		      LDA	#2
+   1698  f517		       85 80		      STA	player0x
+   1699  f519		       a9 34		      LDA	#52
+   1700  f51b		       85 85		      STA	player0y
+   1701  f51d				   .L042		;  player1x = 158 : player1y = 52
+   1702  f51d
+   1703  f51d		       a9 9e		      LDA	#158
+   1704  f51f		       85 81		      STA	player1x
+   1705  f521		       a9 34		      LDA	#52
+   1706  f523		       85 86		      STA	player1y
+   1707  f525				   .L043		;  missile0x = 40
+   1708  f525
+   1709  f525		       a9 28		      LDA	#40
+   1710  f527		       85 82		      STA	missile0x
+   1711  f529				   .L044		;  missile0y = 44
+   1712  f529
+   1713  f529		       a9 2c		      LDA	#44
+   1714  f52b		       85 91		      STA	missile0y
+   1715  f52d				   .L045		;  missile0dx	=  0
+   1716  f52d
+   1717  f52d		       a9 00		      LDA	#0
+   1718  f52f		       85 d6		      STA	missile0dx
+   1719  f531				   .L046		;  missile0dy	=  0
+   1720  f531
+   1721  f531		       a9 00		      LDA	#0
+   1722  f533		       85 d7		      STA	missile0dy
+   1723  f535				   .L047		;  missile1x = 150
+   1724  f535
+   1725  f535		       a9 96		      LDA	#150
+   1726  f537		       85 83		      STA	missile1x
+   1727  f539				   .L048		;  missile1y = 44
+   1728  f539
+   1729  f539		       a9 2c		      LDA	#44
+   1730  f53b		       85 88		      STA	missile1y
+   1731  f53d				   .L049		;  missile1dx	=  0
+   1732  f53d
+   1733  f53d		       a9 00		      LDA	#0
+   1734  f53f		       85 d8		      STA	missile1dx
+   1735  f541				   .L050		;  missile1dy	=  0
+   1736  f541
+   1737  f541		       a9 00		      LDA	#0
+   1738  f543		       85 d9		      STA	missile1dy
+   1739  f545				   .
+   1740  f545							;
+   1741  f545
+   1742  f545				   .drawborders
+   1743  f545							; drawborders
+   1744  f545
+   1745  f545				   .L051		;  pfvline 14 0 11 on
+   1746  f545
+   1747  f545		       a9 0b		      LDA	#11
+   1748  f547		       85 9e		      STA	temp3
+   1749  f549		       a9 0e		      LDA	#14
+   1750  f54b		       a0 00		      LDY	#0
+   1751  f54d		       a2 00		      LDX	#0
+   1752  f54f		       20 c4 f2 	      jsr	pfvline
+   1753  f552				   .L052		;  pfvline 15 0 11 on
+   1754  f552
+   1755  f552		       a9 0b		      LDA	#11
+   1756  f554		       85 9e		      STA	temp3
+   1757  f556		       a9 0f		      LDA	#15
+   1758  f558		       a0 00		      LDY	#0
+   1759  f55a		       a2 00		      LDX	#0
+   1760  f55c		       20 c4 f2 	      jsr	pfvline
+   1761  f55f				   .L053		;  pfvline 16 0 11 on
+   1762  f55f
+   1763  f55f		       a9 0b		      LDA	#11
+   1764  f561		       85 9e		      STA	temp3
+   1765  f563		       a9 10		      LDA	#16
+   1766  f565		       a0 00		      LDY	#0
+   1767  f567		       a2 00		      LDX	#0
+   1768  f569		       20 c4 f2 	      jsr	pfvline
+   1769  f56c				   .
+   1770  f56c							;
+   1771  f56c
+   1772  f56c				   .
+   1773  f56c							;
+   1774  f56c
+   1775  f56c				   .gameloop
+   1776  f56c							; gameloop
+   1777  f56c
+   1778  f56c				   .L054		;  COLUP0  =  14
+   1779  f56c
+   1780  f56c		       a9 0e		      LDA	#14
+   1781  f56e		       85 06		      STA	COLUP0
+   1782  f570				   .L055		;  COLUP1  =  14
+   1783  f570
+   1784  f570		       a9 0e		      LDA	#14
+   1785  f572		       85 07		      STA	COLUP1
+   1786  f574				   .L056		;  COLUPF  =  64
+   1787  f574
+   1788  f574		       a9 40		      LDA	#64
+   1789  f576		       85 08		      STA	COLUPF
+   1790  f578				   .L057		;  COLUBK  =  70
+   1791  f578
+   1792  f578		       a9 46		      LDA	#70
+   1793  f57a		       85 09		      STA	COLUBK
+   1794  f57c				   .L058		;  drawscreen
+   1795  f57c
+   1796  f57c		       20 ee f3 	      jsr	drawscreen
+   1797  f57f				   .L059		;  if joy0fire  &&  missile0dx  =  0 then gosub startball0
+   1798  f57f
+   1799  f57f		       24 0c		      bit	INPT4
+   1800  f581		       30 09		      BMI	.skipL059
+   1801  f583				   .condpart0
+   1802  f583		       a5 d6		      LDA	missile0dx
+   1803  f585		       c9 00		      CMP	#0
+   1804  f587		       d0 03		      BNE	.skip0then
+   1805  f589				   .condpart1
+   1806  f589		       20 0b f9 	      jsr	.startball0
+   1807  f58c
+   1808  f58c				   .skip0then
+   1809  f58c				   .skipL059
+   1810  f58c				   .L060		;  if joy0up then player0y  =	player0y  -  2 :  if player0y  <  16 then player0y  =  16
+   1811  f58c
+   1812  f58c		       a9 10		      lda	#$10
+   1813  f58e		       2c 80 02 	      bit	SWCHA
+   1814  f591		       d0 11		      BNE	.skipL060
+   1815  f593				   .condpart2
+   1816  f593		       a5 85		      LDA	player0y
+   1817  f595		       38		      SEC
+   1818  f596		       e9 02		      SBC	#2
+   1819  f598		       85 85		      STA	player0y
+   1820  f59a		       a5 85		      LDA	player0y
+   1821  f59c		       c9 10		      CMP	#16
+   1822  f59e		       b0 04		      BCS	.skip2then
+   1823  f5a0				   .condpart3
+   1824  f5a0		       a9 10		      LDA	#16
+   1825  f5a2		       85 85		      STA	player0y
+   1826  f5a4				   .skip2then
+   1827  f5a4				   .skipL060
+   1828  f5a4				   .L061		;  if joy0down then player0y  =  player0y  +  2 :  if player0y  >  88 then player0y  =  88
+   1829  f5a4
+   1830  f5a4		       a9 20		      lda	#$20
+   1831  f5a6		       2c 80 02 	      bit	SWCHA
+   1832  f5a9		       d0 11		      BNE	.skipL061
+   1833  f5ab				   .condpart4
+   1834  f5ab		       a5 85		      LDA	player0y
+   1835  f5ad		       18		      CLC
+   1836  f5ae		       69 02		      ADC	#2
+   1837  f5b0		       85 85		      STA	player0y
+   1838  f5b2		       a9 58		      LDA	#88
+   1839  f5b4		       c5 85		      CMP	player0y
+   1840  f5b6		       b0 04		      BCS	.skip4then
+   1841  f5b8				   .condpart5
+   1842  f5b8		       a9 58		      LDA	#88
+   1843  f5ba		       85 85		      STA	player0y
+   1844  f5bc				   .skip4then
+   1845  f5bc				   .skipL061
+   1846  f5bc				   .L062		;  if joy1fire  &&  missile1dx  =  0 then gosub startball1
+   1847  f5bc
+   1848  f5bc		       24 0d		      bit	INPT5
+   1849  f5be		       30 09		      BMI	.skipL062
+   1850  f5c0				   .condpart6
+   1851  f5c0		       a5 d8		      LDA	missile1dx
+   1852  f5c2		       c9 00		      CMP	#0
+   1853  f5c4		       d0 03		      BNE	.skip6then
+   1854  f5c6				   .condpart7
+   1855  f5c6		       20 13 f9 	      jsr	.startball1
+   1856  f5c9
+   1857  f5c9				   .skip6then
+   1858  f5c9				   .skipL062
+   1859  f5c9				   .L063		;  if joy1up then player1y  =	player1y  -  2 :  if player1y  <  16 then player1y  =  16
+   1860  f5c9
+   1861  f5c9		       a9 01		      lda	#1
+   1862  f5cb		       2c 80 02 	      bit	SWCHA
+   1863  f5ce		       d0 11		      BNE	.skipL063
+   1864  f5d0				   .condpart8
+   1865  f5d0		       a5 86		      LDA	player1y
+   1866  f5d2		       38		      SEC
+   1867  f5d3		       e9 02		      SBC	#2
+   1868  f5d5		       85 86		      STA	player1y
+   1869  f5d7		       a5 86		      LDA	player1y
+   1870  f5d9		       c9 10		      CMP	#16
+   1871  f5db		       b0 04		      BCS	.skip8then
+   1872  f5dd				   .condpart9
+   1873  f5dd		       a9 10		      LDA	#16
+   1874  f5df		       85 86		      STA	player1y
+   1875  f5e1				   .skip8then
+   1876  f5e1				   .skipL063
+   1877  f5e1				   .L064		;  if joy1down then player1y  =  player1y  +  2 :  if player1y  >  88 then player1y  =  88
+   1878  f5e1
+   1879  f5e1		       a9 02		      lda	#2
+   1880  f5e3		       2c 80 02 	      bit	SWCHA
+   1881  f5e6		       d0 11		      BNE	.skipL064
+   1882  f5e8				   .condpart10
+   1883  f5e8		       a5 86		      LDA	player1y
+   1884  f5ea		       18		      CLC
+   1885  f5eb		       69 02		      ADC	#2
+   1886  f5ed		       85 86		      STA	player1y
+   1887  f5ef		       a9 58		      LDA	#88
+   1888  f5f1		       c5 86		      CMP	player1y
+   1889  f5f3		       b0 04		      BCS	.skip10then
+   1890  f5f5				   .condpart11
+   1891  f5f5		       a9 58		      LDA	#88
+   1892  f5f7		       85 86		      STA	player1y
+   1893  f5f9				   .skip10then
+   1894  f5f9				   .skipL064
+   1895  f5f9				   .L065		;  missile0x  =  missile0x  +	missile0dx
+   1896  f5f9
+   1897  f5f9		       a5 82		      LDA	missile0x
+   1898  f5fb		       18		      CLC
+   1899  f5fc		       65 d6		      ADC	missile0dx
+   1900  f5fe		       85 82		      STA	missile0x
+   1901  f600				   .L066		;  missile1x  =  missile1x  +	missile1dx
+   1902  f600
+   1903  f600		       a5 83		      LDA	missile1x
+   1904  f602		       18		      CLC
+   1905  f603		       65 d8		      ADC	missile1dx
+   1906  f605		       85 83		      STA	missile1x
+   1907  f607				   .L067		;  missile0y  =  missile0y  +	missile0dy
+   1908  f607
+   1909  f607		       a5 91		      LDA	missile0y
+   1910  f609		       18		      CLC
+   1911  f60a		       65 d7		      ADC	missile0dy
+   1912  f60c		       85 91		      STA	missile0y
+   1913  f60e				   .L068		;  missile1y  =  missile1y  +	missile1dy
+   1914  f60e
+   1915  f60e		       a5 88		      LDA	missile1y
+   1916  f610		       18		      CLC
+   1917  f611		       65 d9		      ADC	missile1dy
+   1918  f613		       85 88		      STA	missile1y
+   1919  f615				   .L069		;  rem PADDLE COLLISIONS
+   1920  f615
+   1921  f615				   .L070		;  if collision(player1,missile0) then soundTimer  =  16
+   1922  f615
+   1923  f615		       24 00		      BIT	CXM0P
+   1924  f617		       10 04		      BPL	.skipL070
+   1925  f619				   .condpart12
+   1926  f619		       a9 10		      LDA	#16
+   1927  f61b		       85 e0		      STA	soundTimer
+   1928  f61d				   .skipL070
+   1929  f61d				   .L071		;  if collision(player1,missile0) then gosub collidep1b0
+   1930  f61d
+   1931  f61d		       24 00		      BIT	CXM0P
+   1932  f61f		       10 03		      BPL	.skipL071
+   1933  f621				   .condpart13
+   1934  f621		       20 42 f8 	      jsr	.collidep1b0
+   1935  f624
+   1936  f624				   .skipL071
+   1937  f624				   .L072		;  if collision(player0,missile0) then soundTimer  =  16
+   1938  f624
+   1939  f624		       24 00		      BIT	CXM0P
+   1940  f626		       50 04		      BVC	.skipL072
+   1941  f628				   .condpart14
+   1942  f628		       a9 10		      LDA	#16
+   1943  f62a		       85 e0		      STA	soundTimer
+   1944  f62c				   .skipL072
+   1945  f62c				   .L073		;  if collision(player0,missile0) then gosub collidep0b0
+   1946  f62c
+   1947  f62c		       24 00		      BIT	CXM0P
+   1948  f62e		       50 03		      BVC	.skipL073
+   1949  f630				   .condpart15
+   1950  f630		       20 0b f8 	      jsr	.collidep0b0
+   1951  f633
+   1952  f633				   .skipL073
+   1953  f633				   .L074		;  if collision(player1,missile1) then soundTimer  =  16
+   1954  f633
+   1955  f633		       24 01		      BIT	CXM1P
+   1956  f635		       50 04		      BVC	.skipL074
+   1957  f637				   .condpart16
+   1958  f637		       a9 10		      LDA	#16
+   1959  f639		       85 e0		      STA	soundTimer
+   1960  f63b				   .skipL074
+   1961  f63b				   .L075		;  if collision(player1,missile1) then gosub collidep1b1
+   1962  f63b
+   1963  f63b		       24 01		      BIT	CXM1P
+   1964  f63d		       50 03		      BVC	.skipL075
+   1965  f63f				   .condpart17
+   1966  f63f		       20 d1 f8 	      jsr	.collidep1b1
+   1967  f642
+   1968  f642				   .skipL075
+   1969  f642				   .L076		;  if collision(player0,missile1) then soundTimer  =  16
+   1970  f642
+   1971  f642		       24 01		      BIT	CXM1P
+   1972  f644		       10 04		      BPL	.skipL076
+   1973  f646				   .condpart18
+   1974  f646		       a9 10		      LDA	#16
+   1975  f648		       85 e0		      STA	soundTimer
+   1976  f64a				   .skipL076
+   1977  f64a				   .L077		;  if collision(player0,missile1) then gosub collidep0b1
+   1978  f64a
+   1979  f64a		       24 01		      BIT	CXM1P
+   1980  f64c		       10 03		      BPL	.skipL077
+   1981  f64e				   .condpart19
+   1982  f64e		       20 85 f8 	      jsr	.collidep0b1
+   1983  f651
+   1984  f651				   .skipL077
+   1985  f651				   .L078		;  rem VERTICAL BORDER COLLISION
+   1986  f651
+   1987  f651				   .L079		;  if missile0y  <=  1 then missile0dy = # - missile0dy
+   1988  f651
+   1989  f651		       a9 01		      LDA	#1
+   1990  f653		       c5 91		      CMP	missile0y
+   1991  f655		       90 07		      BCC	.skipL079
+   1992  f657				   .condpart20
+   1993  f657		       a9 00		      LDA	##
+   1994  f659		       38		      SEC
+   1995  f65a		       e5 d7		      SBC	missile0dy
+   1996  f65c		       85 d7		      STA	missile0dy
+   1997  f65e				   .skipL079
+   1998  f65e				   .L080		;  if missile0y  <=  1 then missile0y = 1
+   1999  f65e
+   2000  f65e		       a9 01		      LDA	#1
+   2001  f660		       c5 91		      CMP	missile0y
+   2002  f662		       90 04		      BCC	.skipL080
+   2003  f664				   .condpart21
+   2004  f664		       a9 01		      LDA	#1
+   2005  f666		       85 91		      STA	missile0y
+   2006  f668				   .skipL080
+   2007  f668				   .L081		;  if missile1y  <=  1 then missile1dy = # - missile1dy
+   2008  f668
+   2009  f668		       a9 01		      LDA	#1
+   2010  f66a		       c5 88		      CMP	missile1y
+   2011  f66c		       90 07		      BCC	.skipL081
+   2012  f66e				   .condpart22
+   2013  f66e		       a9 00		      LDA	##
+   2014  f670		       38		      SEC
+   2015  f671		       e5 d9		      SBC	missile1dy
+   2016  f673		       85 d9		      STA	missile1dy
+   2017  f675				   .skipL081
+   2018  f675				   .L082		;  if missile1y  <=  1 then missile1y = 1
+   2019  f675
+   2020  f675		       a9 01		      LDA	#1
+   2021  f677		       c5 88		      CMP	missile1y
+   2022  f679		       90 04		      BCC	.skipL082
+   2023  f67b				   .condpart23
+   2024  f67b		       a9 01		      LDA	#1
+   2025  f67d		       85 88		      STA	missile1y
+   2026  f67f				   .skipL082
+   2027  f67f				   .L083		;  if missile0y  >=  88 then missile0dy =  # - missile0dy
+   2028  f67f
+   2029  f67f		       a5 91		      LDA	missile0y
+   2030  f681		       c9 58		      CMP	#88
+   2031  f683		       90 07		      BCC	.skipL083
+   2032  f685				   .condpart24
+   2033  f685		       a9 00		      LDA	##
+   2034  f687		       38		      SEC
+   2035  f688		       e5 d7		      SBC	missile0dy
+   2036  f68a		       85 d7		      STA	missile0dy
+   2037  f68c				   .skipL083
+   2038  f68c				   .L084		;  if missile0y  >=  88 then missile0y = 88
+   2039  f68c
+   2040  f68c		       a5 91		      LDA	missile0y
+   2041  f68e		       c9 58		      CMP	#88
+   2042  f690		       90 04		      BCC	.skipL084
+   2043  f692				   .condpart25
+   2044  f692		       a9 58		      LDA	#88
+   2045  f694		       85 91		      STA	missile0y
+   2046  f696				   .skipL084
+   2047  f696				   .L085		;  if missile1y  >=  88 then missile1dy =  # - missile1dy
+   2048  f696
+   2049  f696		       a5 88		      LDA	missile1y
+   2050  f698		       c9 58		      CMP	#88
+   2051  f69a		       90 07		      BCC	.skipL085
+   2052  f69c				   .condpart26
+   2053  f69c		       a9 00		      LDA	##
+   2054  f69e		       38		      SEC
+   2055  f69f		       e5 d9		      SBC	missile1dy
+   2056  f6a1		       85 d9		      STA	missile1dy
+   2057  f6a3				   .skipL085
+   2058  f6a3				   .L086		;  if missile1y  >=  88 then missile1y = 88
+   2059  f6a3
+   2060  f6a3		       a5 88		      LDA	missile1y
+   2061  f6a5		       c9 58		      CMP	#88
+   2062  f6a7		       90 04		      BCC	.skipL086
+   2063  f6a9				   .condpart27
+   2064  f6a9		       a9 58		      LDA	#88
+   2065  f6ab		       85 88		      STA	missile1y
+   2066  f6ad				   .skipL086
+   2067  f6ad				   .L087		;  rem HORIZONTAL BORDER COLLISION
+   2068  f6ad
+   2069  f6ad				   .L088		;  if missile0x  <=  16 then goto player2win
+   2070  f6ad
+   2071  f6ad		       a9 10		      LDA	#16
+   2072  f6af		       c5 82		      CMP	missile0x
+   2073  f6b1		       90 03		      BCC	.skipL088
+   2074  f6b3				   .condpart28
+   2075  f6b3		       4c 33 f9 	      jmp	.player2win
+   2076  f6b6
+   2077  f6b6				   .skipL088
+   2078  f6b6				   .L089		;  if missile0x  >=  175 then goto player1win
+   2079  f6b6
+   2080  f6b6		       a5 82		      LDA	missile0x
+   2081  f6b8		       c9 af		      CMP	#175
+   2082  f6ba		       90 03		      BCC	.skipL089
+   2083  f6bc				   .condpart29
+   2084  f6bc		       4c 21 f9 	      jmp	.player1win
+   2085  f6bf
+   2086  f6bf				   .skipL089
+   2087  f6bf				   .L090		;  if missile1x  <=  16 then goto player2win
+   2088  f6bf
+   2089  f6bf		       a9 10		      LDA	#16
+   2090  f6c1		       c5 83		      CMP	missile1x
+   2091  f6c3		       90 03		      BCC	.skipL090
+   2092  f6c5				   .condpart30
+   2093  f6c5		       4c 33 f9 	      jmp	.player2win
+   2094  f6c8
+   2095  f6c8				   .skipL090
+   2096  f6c8				   .L091		;  if missile1x  >=  175 then goto player1win
+   2097  f6c8
+   2098  f6c8		       a5 83		      LDA	missile1x
+   2099  f6ca		       c9 af		      CMP	#175
+   2100  f6cc		       90 03		      BCC	.skipL091
+   2101  f6ce				   .condpart31
+   2102  f6ce		       4c 21 f9 	      jmp	.player1win
+   2103  f6d1
+   2104  f6d1				   .skipL091
+   2105  f6d1				   .L092		;  rem BLOCK COLLISION
+   2106  f6d1
+   2107  f6d1				   .
+   2108  f6d1							;
+   2109  f6d1
+   2110  f6d1				   .L093		;  if collision(missile0,playfield) then gosub pixelcollide0
+   2111  f6d1
+   2112  f6d1		       24 04		      BIT	CXM0FB
+   2113  f6d3		       10 03		      BPL	.skipL093
+   2114  f6d5				   .condpart32
+   2115  f6d5		       20 11 f7 	      jsr	.pixelcollide0
+   2116  f6d8
+   2117  f6d8				   .skipL093
+   2118  f6d8				   .L094		;  if collision(missile1,playfield) then gosub pixelcollide1
+   2119  f6d8
+   2120  f6d8		       24 05		      BIT	CXM1FB
+   2121  f6da		       10 03		      BPL	.skipL094
+   2122  f6dc				   .condpart33
+   2123  f6dc		       20 8e f7 	      jsr	.pixelcollide1
+   2124  f6df
+   2125  f6df				   .skipL094
+   2126  f6df				   .
+   2127  f6df							;
+   2128  f6df
+   2129  f6df				   .L095		;  rem MUSIC
+   2130  f6df
+   2131  f6df				   .L096		;  if musicTimer  <= 1 then gosub changeMusicNote
+   2132  f6df
+   2133  f6df		       a9 01		      LDA	#1
+   2134  f6e1		       c5 dd		      CMP	musicTimer
+   2135  f6e3		       90 03		      BCC	.skipL096
+   2136  f6e5				   .condpart34
+   2137  f6e5		       20 4b f9 	      jsr	.changeMusicNote
+   2138  f6e8
+   2139  f6e8				   .skipL096
+   2140  f6e8				   .L097		;  musicTimer	=  musicTimer  -  1
+   2141  f6e8
+   2142  f6e8		       c6 dd		      DEC	musicTimer
+   2143  f6ea				   .L098		;  if soundTimer  >  0 then AUDF1  =  26
+   2144  f6ea
+   2145  f6ea		       a9 00		      LDA	#0
+   2146  f6ec		       c5 e0		      CMP	soundTimer
+   2147  f6ee		       b0 04		      BCS	.skipL098
+   2148  f6f0				   .condpart35
+   2149  f6f0		       a9 1a		      LDA	#26
+   2150  f6f2		       85 18		      STA	AUDF1
+   2151  f6f4				   .skipL098
+   2152  f6f4				   .L099		;  if soundTimer  >  0 then AUDV1  =  5
+   2153  f6f4
+   2154  f6f4		       a9 00		      LDA	#0
+   2155  f6f6		       c5 e0		      CMP	soundTimer
+   2156  f6f8		       b0 04		      BCS	.skipL099
+   2157  f6fa				   .condpart36
+   2158  f6fa		       a9 05		      LDA	#5
+   2159  f6fc		       85 1a		      STA	AUDV1
+   2160  f6fe				   .skipL099
+   2161  f6fe				   .L0100		;  if soundTimer  >=  1 then soundTimer  =  soundTimer  -  1 else AUDV1  =  0
+   2162  f6fe
+   2163  f6fe		       a5 e0		      LDA	soundTimer
+   2164  f700		       c9 01		      CMP	#1
+   2165  f702		       90 05		      BCC	.skipL0100
+   2166  f704				   .condpart37
+   2167  f704		       c6 e0		      DEC	soundTimer
+   2168  f706		       4c 0d f7 	      jmp	.skipelse0
+   2169  f709				   .skipL0100
+   2170  f709		       a9 00		      LDA	#0
+   2171  f70b		       85 1a		      STA	AUDV1
+   2172  f70d				   .skipelse0
+   2173  f70d				   .L0101		;  goto gameloop
+   2174  f70d
+   2175  f70d		       4c 6c f5 	      jmp	.gameloop
+   2176  f710
+   2177  f710				   .
+   2178  f710							;
+   2179  f710
+   2180  f710				   .L0102		;  return
+   2181  f710
+   2182  f710		       60		      RTS
+   2183  f711				   .
+   2184  f711							;
+   2185  f711
+   2186  f711				   .pixelcollide0
+   2187  f711							; pixelcollide0
+   2188  f711
+   2189  f711				   .L0103		;  tempy =  ( missile0y )  / 8
+   2190  f711
+   2191  f711							; complex statement detected
+   2192  f711		       a5 91		      LDA	missile0y
+   2193  f713		       4a		      lsr
+   2194  f714		       4a		      lsr
+   2195  f715		       4a		      lsr
+   2196  f716		       85 db		      STA	tempy
+   2197  f718				   .L0104		;  tempx  =  missile0x
+   2198  f718
+   2199  f718		       a5 82		      LDA	missile0x
+   2200  f71a		       85 da		      STA	tempx
+   2201  f71c				   .L0105		;  if tempx  <=  86 then tempx =  ( missile0x )  / 5  -  4
+   2202  f71c
+   2203  f71c		       a9 56		      LDA	#86
+   2204  f71e		       c5 da		      CMP	tempx
+   2205  f720		       90 0c		      BCC	.skipL0105
+   2206  f722				   .condpart38
+   2207  f722							; complex statement detected
+   2208  f722		       a5 82		      LDA	missile0x
+   2209  f724		       a0 05		      LDY	#5
+   2210  f726		       20 b9 f4 	      jsr	div8
+   2211  f729		       38		      SEC
+   2212  f72a		       e9 04		      SBC	#4
+   2213  f72c		       85 da		      STA	tempx
+   2214  f72e				   .skipL0105
+   2215  f72e				   .L0106		;  if tempx  <  96  &&  tempx	>  86 then tempx =  ( missile0x )  / 5	-  3
+   2216  f72e
+   2217  f72e		       a5 da		      LDA	tempx
+   2218  f730		       c9 60		      CMP	#96
+   2219  f732		       b0 12		      BCS	.skipL0106
+   2220  f734				   .condpart39
+   2221  f734		       a9 56		      LDA	#86
+   2222  f736		       c5 da		      CMP	tempx
+   2223  f738		       b0 0c		      BCS	.skip39then
+   2224  f73a				   .condpart40
+   2225  f73a							; complex statement detected
+   2226  f73a		       a5 82		      LDA	missile0x
+   2227  f73c		       a0 05		      LDY	#5
+   2228  f73e		       20 b9 f4 	      jsr	div8
+   2229  f741		       38		      SEC
+   2230  f742		       e9 03		      SBC	#3
+   2231  f744		       85 da		      STA	tempx
+   2232  f746				   .skip39then
+   2233  f746				   .skipL0106
+   2234  f746				   .L0107		;  if tempx  >=  96  &&  tempx  < 100 then tempx =  ( missile0x )  / 5  -  3
+   2235  f746
+   2236  f746		       a5 da		      LDA	tempx
+   2237  f748		       c9 60		      CMP	#96
+   2238  f74a		       90 12		      BCC	.skipL0107
+   2239  f74c				   .condpart41
+   2240  f74c		       a5 da		      LDA	tempx
+   2241  f74e		       c9 64		      CMP	#100
+   2242  f750		       b0 0c		      BCS	.skip41then
+   2243  f752				   .condpart42
+   2244  f752							; complex statement detected
+   2245  f752		       a5 82		      LDA	missile0x
+   2246  f754		       a0 05		      LDY	#5
+   2247  f756		       20 b9 f4 	      jsr	div8
+   2248  f759		       38		      SEC
+   2249  f75a		       e9 03		      SBC	#3
+   2250  f75c		       85 da		      STA	tempx
+   2251  f75e				   .skip41then
+   2252  f75e				   .skipL0107
+   2253  f75e				   .L0108		;  if tempx  >=  100 then tempx =  ( missile0x )  / 5	-  2
+   2254  f75e
+   2255  f75e		       a5 da		      LDA	tempx
+   2256  f760		       c9 64		      CMP	#100
+   2257  f762		       90 0c		      BCC	.skipL0108
+   2258  f764				   .condpart43
+   2259  f764							; complex statement detected
+   2260  f764		       a5 82		      LDA	missile0x
+   2261  f766		       a0 05		      LDY	#5
+   2262  f768		       20 b9 f4 	      jsr	div8
+   2263  f76b		       38		      SEC
+   2264  f76c		       e9 02		      SBC	#2
+   2265  f76e		       85 da		      STA	tempx
+   2266  f770				   .skipL0108
+   2267  f770				   .L0109		;  pfpixel tempx tempy off
+   2268  f770
+   2269  f770		       a5 da		      LDA	tempx
+   2270  f772		       a4 db		      LDY	tempy
+   2271  f774		       a2 01		      LDX	#1
+   2272  f776		       20 a9 f2 	      jsr	pfpixel
+   2273  f779				   .L0110		;  rem if missile0dx = #-1 then missile0dx = 1
+   2274  f779
+   2275  f779				   .L0111		;  if missile0dx  =  1 then missile0dx  =  # - 1 else missile0dx  =  1
+   2276  f779
+   2277  f779		       a5 d6		      LDA	missile0dx
+   2278  f77b		       c9 01		      CMP	#1
+   2279  f77d		       d0 0a		      BNE	.skipL0111
+   2280  f77f				   .condpart44
+   2281  f77f		       a9 00		      LDA	##
+   2282  f781		       38		      SEC
+   2283  f782		       e9 01		      SBC	#1
+   2284  f784		       85 d6		      STA	missile0dx
+   2285  f786		       4c 8d f7 	      jmp	.skipelse1
+   2286  f789				   .skipL0111
+   2287  f789		       a9 01		      LDA	#1
+   2288  f78b		       85 d6		      STA	missile0dx
+   2289  f78d				   .skipelse1
+   2290  f78d				   .L0112		;  rem missile0dy = #-missile0dy
+   2291  f78d
+   2292  f78d				   .L0113		;  return
+   2293  f78d
+   2294  f78d		       60		      RTS
+   2295  f78e				   .pixelcollide1
+   2296  f78e							; pixelcollide1
+   2297  f78e
+   2298  f78e				   .L0114		;  tempy =  ( missile1y )  / 8
+   2299  f78e
+   2300  f78e							; complex statement detected
+   2301  f78e		       a5 88		      LDA	missile1y
+   2302  f790		       4a		      lsr
+   2303  f791		       4a		      lsr
+   2304  f792		       4a		      lsr
+   2305  f793		       85 db		      STA	tempy
+   2306  f795				   .L0115		;  tempx  =  missile1x
+   2307  f795
+   2308  f795		       a5 83		      LDA	missile1x
+   2309  f797		       85 da		      STA	tempx
+   2310  f799				   .L0116		;  if tempx  <=  86 then tempx =  ( missile1x )  / 5  -  4
+   2311  f799
+   2312  f799		       a9 56		      LDA	#86
+   2313  f79b		       c5 da		      CMP	tempx
+   2314  f79d		       90 0c		      BCC	.skipL0116
+   2315  f79f				   .condpart45
+   2316  f79f							; complex statement detected
+   2317  f79f		       a5 83		      LDA	missile1x
+   2318  f7a1		       a0 05		      LDY	#5
+   2319  f7a3		       20 b9 f4 	      jsr	div8
+   2320  f7a6		       38		      SEC
+   2321  f7a7		       e9 04		      SBC	#4
+   2322  f7a9		       85 da		      STA	tempx
+   2323  f7ab				   .skipL0116
+   2324  f7ab				   .L0117		;  if tempx  <  96  &&  tempx	>  86 then tempx =  ( missile1x )  / 5	-  3
+   2325  f7ab
+   2326  f7ab		       a5 da		      LDA	tempx
+   2327  f7ad		       c9 60		      CMP	#96
+   2328  f7af		       b0 12		      BCS	.skipL0117
+   2329  f7b1				   .condpart46
+   2330  f7b1		       a9 56		      LDA	#86
+   2331  f7b3		       c5 da		      CMP	tempx
+   2332  f7b5		       b0 0c		      BCS	.skip46then
+   2333  f7b7				   .condpart47
+   2334  f7b7							; complex statement detected
+   2335  f7b7		       a5 83		      LDA	missile1x
+   2336  f7b9		       a0 05		      LDY	#5
+   2337  f7bb		       20 b9 f4 	      jsr	div8
+   2338  f7be		       38		      SEC
+   2339  f7bf		       e9 03		      SBC	#3
+   2340  f7c1		       85 da		      STA	tempx
+   2341  f7c3				   .skip46then
+   2342  f7c3				   .skipL0117
+   2343  f7c3				   .L0118		;  if tempx  >=  96  &&  tempx  < 100 then tempx =  ( missile1x )  / 5  -  3
+   2344  f7c3
+   2345  f7c3		       a5 da		      LDA	tempx
+   2346  f7c5		       c9 60		      CMP	#96
+   2347  f7c7		       90 12		      BCC	.skipL0118
+   2348  f7c9				   .condpart48
+   2349  f7c9		       a5 da		      LDA	tempx
+   2350  f7cb		       c9 64		      CMP	#100
+   2351  f7cd		       b0 0c		      BCS	.skip48then
+   2352  f7cf				   .condpart49
+   2353  f7cf							; complex statement detected
+   2354  f7cf		       a5 83		      LDA	missile1x
+   2355  f7d1		       a0 05		      LDY	#5
+   2356  f7d3		       20 b9 f4 	      jsr	div8
+   2357  f7d6		       38		      SEC
+   2358  f7d7		       e9 03		      SBC	#3
+   2359  f7d9		       85 da		      STA	tempx
+   2360  f7db				   .skip48then
+   2361  f7db				   .skipL0118
+   2362  f7db				   .L0119		;  if tempx  >=  100 then tempx =  ( missile1x )  / 5	-  2
+   2363  f7db
+   2364  f7db		       a5 da		      LDA	tempx
+   2365  f7dd		       c9 64		      CMP	#100
+   2366  f7df		       90 0c		      BCC	.skipL0119
+   2367  f7e1				   .condpart50
+   2368  f7e1							; complex statement detected
+   2369  f7e1		       a5 83		      LDA	missile1x
+   2370  f7e3		       a0 05		      LDY	#5
+   2371  f7e5		       20 b9 f4 	      jsr	div8
+   2372  f7e8		       38		      SEC
+   2373  f7e9		       e9 02		      SBC	#2
+   2374  f7eb		       85 da		      STA	tempx
+   2375  f7ed				   .skipL0119
+   2376  f7ed				   .L0120		;  pfpixel tempx tempy off
+   2377  f7ed
+   2378  f7ed		       a5 da		      LDA	tempx
+   2379  f7ef		       a4 db		      LDY	tempy
+   2380  f7f1		       a2 01		      LDX	#1
+   2381  f7f3		       20 a9 f2 	      jsr	pfpixel
+   2382  f7f6				   .L0121		;  rem if missile1dx = #-1 then missile1dx = 1
+   2383  f7f6
+   2384  f7f6				   .L0122		;  if missile1dx  =  1 then missile1dx  =  # - 1 else missile1dx  =  1
+   2385  f7f6
+   2386  f7f6		       a5 d8		      LDA	missile1dx
+   2387  f7f8		       c9 01		      CMP	#1
+   2388  f7fa		       d0 0a		      BNE	.skipL0122
+   2389  f7fc				   .condpart51
+   2390  f7fc		       a9 00		      LDA	##
+   2391  f7fe		       38		      SEC
+   2392  f7ff		       e9 01		      SBC	#1
+   2393  f801		       85 d8		      STA	missile1dx
+   2394  f803		       4c 0a f8 	      jmp	.skipelse2
+   2395  f806				   .skipL0122
+   2396  f806		       a9 01		      LDA	#1
+   2397  f808		       85 d8		      STA	missile1dx
+   2398  f80a				   .skipelse2
+   2399  f80a				   .L0123		;  rem missile1dy = #-missile1dy
+   2400  f80a
+   2401  f80a				   .L0124		;  return
+   2402  f80a
+   2403  f80a		       60		      RTS
+   2404  f80b				   .
+   2405  f80b							;
+   2406  f80b
+   2407  f80b				   .collidep0b0
+   2408  f80b							; collidep0b0
+   2409  f80b
+   2410  f80b				   .L0125		;  z  =  player0y  -  missile0y
+   2411  f80b
+   2412  f80b		       a5 85		      LDA	player0y
+   2413  f80d		       38		      SEC
+   2414  f80e		       e5 91		      SBC	missile0y
+   2415  f810		       85 ef		      STA	z
+   2416  f812				   .L0126		;  z  =  z / 4
+   2417  f812
+   2418  f812		       a5 ef		      LDA	z
+   2419  f814		       4a		      lsr
+   2420  f815		       4a		      lsr
+   2421  f816		       85 ef		      STA	z
+   2422  f818				   .L0127		;  if z  >=  2 then missile0dy  =  # - 1
+   2423  f818
+   2424  f818		       a5 ef		      LDA	z
+   2425  f81a		       c9 02		      CMP	#2
+   2426  f81c		       90 07		      BCC	.skipL0127
+   2427  f81e				   .condpart52
+   2428  f81e		       a9 00		      LDA	##
+   2429  f820		       38		      SEC
+   2430  f821		       e9 01		      SBC	#1
+   2431  f823		       85 d7		      STA	missile0dy
+   2432  f825				   .skipL0127
+   2433  f825				   .L0128		;  if z  <=  1 then missile0dy  =  1
+   2434  f825
+   2435  f825		       a9 01		      LDA	#1
+   2436  f827		       c5 ef		      CMP	z
+   2437  f829		       90 04		      BCC	.skipL0128
+   2438  f82b				   .condpart53
+   2439  f82b		       a9 01		      LDA	#1
+   2440  f82d		       85 d7		      STA	missile0dy
+   2441  f82f				   .skipL0128
+   2442  f82f				   .L0129		;  missile0dx	=  1
+   2443  f82f
+   2444  f82f		       a9 01		      LDA	#1
+   2445  f831		       85 d6		      STA	missile0dx
+   2446  f833				   .L0130		;  missile0x  =  missile0x  +	missile0dx
+   2447  f833
+   2448  f833		       a5 82		      LDA	missile0x
+   2449  f835		       18		      CLC
+   2450  f836		       65 d6		      ADC	missile0dx
+   2451  f838		       85 82		      STA	missile0x
+   2452  f83a				   .L0131		;  missile0y  =  missile0y  +	missile0dy
+   2453  f83a
+   2454  f83a		       a5 91		      LDA	missile0y
+   2455  f83c		       18		      CLC
+   2456  f83d		       65 d7		      ADC	missile0dy
+   2457  f83f		       85 91		      STA	missile0y
+   2458  f841				   .L0132		;  return
+   2459  f841
+   2460  f841		       60		      RTS
+   2461  f842				   .
+   2462  f842							;
+   2463  f842
+   2464  f842				   .collidep1b0
+   2465  f842							; collidep1b0
+   2466  f842
+   2467  f842				   .L0133		;  z  =  player1y  -  missile0y
+   2468  f842
+   2469  f842		       a5 86		      LDA	player1y
+   2470  f844		       38		      SEC
+   2471  f845		       e5 91		      SBC	missile0y
+   2472  f847		       85 ef		      STA	z
+   2473  f849				   .L0134		;  z  =  z / 4
+   2474  f849
+   2475  f849		       a5 ef		      LDA	z
+   2476  f84b		       4a		      lsr
+   2477  f84c		       4a		      lsr
+   2478  f84d		       85 ef		      STA	z
+   2479  f84f				   .L0135		;  if z  >=  2 then missile0dy  =  # - 1
+   2480  f84f
+   2481  f84f		       a5 ef		      LDA	z
+   2482  f851		       c9 02		      CMP	#2
+   2483  f853		       90 07		      BCC	.skipL0135
+   2484  f855				   .condpart54
+   2485  f855		       a9 00		      LDA	##
+   2486  f857		       38		      SEC
+   2487  f858		       e9 01		      SBC	#1
+   2488  f85a		       85 d7		      STA	missile0dy
+   2489  f85c				   .skipL0135
+   2490  f85c				   .L0136		;  if z  <=  1 then missile0dy  =  1
+   2491  f85c
+   2492  f85c		       a9 01		      LDA	#1
+   2493  f85e		       c5 ef		      CMP	z
+   2494  f860		       90 04		      BCC	.skipL0136
+   2495  f862				   .condpart55
+   2496  f862		       a9 01		      LDA	#1
+   2497  f864		       85 d7		      STA	missile0dy
+   2498  f866				   .skipL0136
+   2499  f866				   .L0137		;  missile0dx	=  # - 1
+   2500  f866
+   2501  f866		       a9 00		      LDA	##
+   2502  f868		       38		      SEC
+   2503  f869		       e9 01		      SBC	#1
+   2504  f86b		       85 d6		      STA	missile0dx
+   2505  f86d				   .L0138		;  missile0x  =  missile0x  +	missile0dx
+   2506  f86d
+   2507  f86d		       a5 82		      LDA	missile0x
+   2508  f86f		       18		      CLC
+   2509  f870		       65 d6		      ADC	missile0dx
+   2510  f872		       85 82		      STA	missile0x
+   2511  f874				   .L0139		;  missile0y  =  missile0y  +	missile0dy
+   2512  f874
+   2513  f874		       a5 91		      LDA	missile0y
+   2514  f876		       18		      CLC
+   2515  f877		       65 d7		      ADC	missile0dy
+   2516  f879		       85 91		      STA	missile0y
+   2517  f87b				   .L0140		;  score  =  score  +	10000
+   2518  f87b
+   2519  f87b		       f8		      SED
+   2520  f87c		       18		      CLC
+   2521  f87d		       a5 93		      LDA	score
+   2522  f87f		       69 01		      ADC	#$01
+   2523  f881		       85 93		      STA	score
+   2524  f883		       d8		      CLD
+   2525  f884				   .L0141		;  return
+   2526  f884
+   2527  f884		       60		      RTS
+   2528  f885				   .
+   2529  f885							;
+   2530  f885
+   2531  f885				   .collidep0b1
+   2532  f885							; collidep0b1
+   2533  f885
+   2534  f885				   .L0142		;  z  =  player0y  -  missile1y
+   2535  f885
+   2536  f885		       a5 85		      LDA	player0y
+   2537  f887		       38		      SEC
+   2538  f888		       e5 88		      SBC	missile1y
+   2539  f88a		       85 ef		      STA	z
+   2540  f88c				   .L0143		;  z  =  z / 4
+   2541  f88c
+   2542  f88c		       a5 ef		      LDA	z
+   2543  f88e		       4a		      lsr
+   2544  f88f		       4a		      lsr
+   2545  f890		       85 ef		      STA	z
+   2546  f892				   .
+   2547  f892							;
+   2548  f892
+   2549  f892				   .L0144		;  if z  >=  2 then missile1dy  =  # - 1
+   2550  f892
+   2551  f892		       a5 ef		      LDA	z
+   2552  f894		       c9 02		      CMP	#2
+   2553  f896		       90 07		      BCC	.skipL0144
+   2554  f898				   .condpart56
+   2555  f898		       a9 00		      LDA	##
+   2556  f89a		       38		      SEC
+   2557  f89b		       e9 01		      SBC	#1
+   2558  f89d		       85 d9		      STA	missile1dy
+   2559  f89f				   .skipL0144
+   2560  f89f				   .L0145		;  if z  <=  1 then missile1dy  =  1
+   2561  f89f
+   2562  f89f		       a9 01		      LDA	#1
+   2563  f8a1		       c5 ef		      CMP	z
+   2564  f8a3		       90 04		      BCC	.skipL0145
+   2565  f8a5				   .condpart57
+   2566  f8a5		       a9 01		      LDA	#1
+   2567  f8a7		       85 d9		      STA	missile1dy
+   2568  f8a9				   .skipL0145
+   2569  f8a9				   .L0146		;  missile1dx	=  1
+   2570  f8a9
+   2571  f8a9		       a9 01		      LDA	#1
+   2572  f8ab		       85 d8		      STA	missile1dx
+   2573  f8ad				   .L0147		;  missile1x  =  missile1x  +	missile1dx
+   2574  f8ad
+   2575  f8ad		       a5 83		      LDA	missile1x
+   2576  f8af		       18		      CLC
+   2577  f8b0		       65 d8		      ADC	missile1dx
+   2578  f8b2		       85 83		      STA	missile1x
+   2579  f8b4				   .L0148		;  missile1y  =  missile1y  +	missile1dy
+   2580  f8b4
+   2581  f8b4		       a5 88		      LDA	missile1y
+   2582  f8b6		       18		      CLC
+   2583  f8b7		       65 d9		      ADC	missile1dy
+   2584  f8b9		       85 88		      STA	missile1y
+   2585  f8bb				   .L0149		;  score  =  score  +	10
+   2586  f8bb
+   2587  f8bb		       f8		      SED
+   2588  f8bc		       18		      CLC
+   2589  f8bd		       a5 95		      LDA	score+2
+   2590  f8bf		       69 10		      ADC	#$10
+   2591  f8c1		       85 95		      STA	score+2
+   2592  f8c3		       a5 94		      LDA	score+1
+   2593  f8c5		       69 00		      ADC	#$00
+   2594  f8c7		       85 94		      STA	score+1
+   2595  f8c9		       a5 93		      LDA	score
+   2596  f8cb		       69 00		      ADC	#$00
+   2597  f8cd		       85 93		      STA	score
+   2598  f8cf		       d8		      CLD
+   2599  f8d0				   .L0150		;  return
+   2600  f8d0
+   2601  f8d0		       60		      RTS
+   2602  f8d1				   .
+   2603  f8d1							;
+   2604  f8d1
+   2605  f8d1				   .collidep1b1
+   2606  f8d1							; collidep1b1
+   2607  f8d1
+   2608  f8d1				   .L0151		;  z  =  player1y  -  missile1y
+   2609  f8d1
+   2610  f8d1		       a5 86		      LDA	player1y
+   2611  f8d3		       38		      SEC
+   2612  f8d4		       e5 88		      SBC	missile1y
+   2613  f8d6		       85 ef		      STA	z
+   2614  f8d8				   .L0152		;  z  =  z / 4
+   2615  f8d8
+   2616  f8d8		       a5 ef		      LDA	z
+   2617  f8da		       4a		      lsr
+   2618  f8db		       4a		      lsr
+   2619  f8dc		       85 ef		      STA	z
+   2620  f8de				   .
+   2621  f8de							;
+   2622  f8de
+   2623  f8de				   .L0153		;  if z  >=  2 then missile1dy  =  # - 1
+   2624  f8de
+   2625  f8de		       a5 ef		      LDA	z
+   2626  f8e0		       c9 02		      CMP	#2
+   2627  f8e2		       90 07		      BCC	.skipL0153
+   2628  f8e4				   .condpart58
+   2629  f8e4		       a9 00		      LDA	##
+   2630  f8e6		       38		      SEC
+   2631  f8e7		       e9 01		      SBC	#1
+   2632  f8e9		       85 d9		      STA	missile1dy
+   2633  f8eb				   .skipL0153
+   2634  f8eb				   .L0154		;  if z  <=  1 then missile1dy  =  1
+   2635  f8eb
+   2636  f8eb		       a9 01		      LDA	#1
+   2637  f8ed		       c5 ef		      CMP	z
+   2638  f8ef		       90 04		      BCC	.skipL0154
+   2639  f8f1				   .condpart59
+   2640  f8f1		       a9 01		      LDA	#1
+   2641  f8f3		       85 d9		      STA	missile1dy
+   2642  f8f5				   .skipL0154
+   2643  f8f5				   .L0155		;  missile1dx	=  # - 1
+   2644  f8f5
+   2645  f8f5		       a9 00		      LDA	##
+   2646  f8f7		       38		      SEC
+   2647  f8f8		       e9 01		      SBC	#1
+   2648  f8fa		       85 d8		      STA	missile1dx
+   2649  f8fc				   .L0156		;  missile1x  =  missile1x  +	missile1dx
+   2650  f8fc
+   2651  f8fc		       a5 83		      LDA	missile1x
+   2652  f8fe		       18		      CLC
+   2653  f8ff		       65 d8		      ADC	missile1dx
+   2654  f901		       85 83		      STA	missile1x
+   2655  f903				   .L0157		;  missile1y  =  missile1y  +	missile1dy
+   2656  f903
+   2657  f903		       a5 88		      LDA	missile1y
+   2658  f905		       18		      CLC
+   2659  f906		       65 d9		      ADC	missile1dy
+   2660  f908		       85 88		      STA	missile1y
+   2661  f90a				   .L0158		;  return
+   2662  f90a
+   2663  f90a		       60		      RTS
+   2664  f90b				   .
+   2665  f90b							;
+   2666  f90b
+   2667  f90b				   .startball0
+   2668  f90b							; startball0
+   2669  f90b
+   2670  f90b				   .L0159		;  missile0dx	=  # - 1
+   2671  f90b
+   2672  f90b		       a9 00		      LDA	##
+   2673  f90d		       38		      SEC
+   2674  f90e		       e9 01		      SBC	#1
+   2675  f910		       85 d6		      STA	missile0dx
+   2676  f912				   .L0160		;  return
+   2677  f912
+   2678  f912		       60		      RTS
+   2679  f913				   .
+   2680  f913							;
+   2681  f913
+   2682  f913				   .startball1
+   2683  f913							; startball1
+   2684  f913
+   2685  f913				   .L0161		;  missile1dx	=  1
+   2686  f913
+   2687  f913		       a9 01		      LDA	#1
+   2688  f915		       85 d8		      STA	missile1dx
+   2689  f917				   .L0162		;  return
+   2690  f917
+   2691  f917		       60		      RTS
+   2692  f918				   .
+   2693  f918							;
+   2694  f918
+   2695  f918				   .playsound
+   2696  f918							; playsound
+   2697  f918
+   2698  f918				   .L0163		;  AUDV1  =  8
+   2699  f918
+   2700  f918		       a9 08		      LDA	#8
+   2701  f91a		       85 1a		      STA	AUDV1
+   2702  f91c				   .L0164		;  soundTimer	=  10
+   2703  f91c
+   2704  f91c		       a9 0a		      LDA	#10
+   2705  f91e		       85 e0		      STA	soundTimer
+   2706  f920				   .L0165		;  return
+   2707  f920
+   2708  f920		       60		      RTS
+   2709  f921				   .
+   2710  f921							;
+   2711  f921
+   2712  f921				   .player1win
+   2713  f921							; player1win
+   2714  f921
+   2715  f921				   .L0166		;  score  =  score  +	1000
+   2716  f921
+   2717  f921		       f8		      SED
+   2718  f922		       18		      CLC
+   2719  f923		       a5 94		      LDA	score+1
+   2720  f925		       69 10		      ADC	#$10
+   2721  f927		       85 94		      STA	score+1
+   2722  f929		       a5 93		      LDA	score
+   2723  f92b		       69 00		      ADC	#$00
+   2724  f92d		       85 93		      STA	score
+   2725  f92f		       d8		      CLD
+   2726  f930				   .L0167		;  goto startgame
+   2727  f930
+   2728  f930		       4c 15 f5 	      jmp	.startgame
+   2729  f933
+   2730  f933				   .
+   2731  f933							;
+   2732  f933
+   2733  f933				   .player2win
+   2734  f933							; player2win
+   2735  f933
+   2736  f933				   .L0168		;  score  =  score  +	1
+   2737  f933
+   2738  f933		       f8		      SED
+   2739  f934		       18		      CLC
+   2740  f935		       a5 95		      LDA	score+2
+   2741  f937		       69 01		      ADC	#$01
+   2742  f939		       85 95		      STA	score+2
+   2743  f93b		       a5 94		      LDA	score+1
+   2744  f93d		       69 00		      ADC	#$00
+   2745  f93f		       85 94		      STA	score+1
+   2746  f941		       a5 93		      LDA	score
+   2747  f943		       69 00		      ADC	#$00
+   2748  f945		       85 93		      STA	score
+   2749  f947		       d8		      CLD
+   2750  f948				   .L0169		;  goto startgame
+   2751  f948
+   2752  f948		       4c 15 f5 	      jmp	.startgame
+   2753  f94b
+   2754  f94b				   .
+   2755  f94b							;
+   2756  f94b
+   2757  f94b				   .changeMusicNote
+   2758  f94b							; changeMusicNote
+   2759  f94b
+   2760  f94b				   .L0170		;  musicPointer  =  musicPointer  +  1
+   2761  f94b
+   2762  f94b		       e6 dc		      INC	musicPointer
+   2763  f94d				   .
+   2764  f94d							;
+   2765  f94d
+   2766  f94d				   .
+   2767  f94d							;
+   2768  f94d
+   2769  f94d				   .L0171		;  musicPointer  =  musicPointer  +  1
+   2770  f94d
+   2771  f94d		       e6 dc		      INC	musicPointer
+   2772  f94f				   .L0172		;  rem value is (2 * #_OF_NOTES) - 1
+   2773  f94f
+   2774  f94f				   .L0173		;  if musicPointer  >	29 then musicPointer  =  # - 1
+   2775  f94f
+   2776  f94f		       a9 1d		      LDA	#29
+   2777  f951		       c5 dc		      CMP	musicPointer
+   2778  f953		       b0 07		      BCS	.skipL0173
+   2779  f955				   .condpart60
+   2780  f955		       a9 00		      LDA	##
+   2781  f957		       38		      SEC
+   2782  f958		       e9 01		      SBC	#1
+   2783  f95a		       85 dc		      STA	musicPointer
+   2784  f95c				   .skipL0173
+   2785  f95c				   .L0174		;  return
+   2786  f95c
+   2787  f95c		       60		      RTS
+   2788  f95d				  -	      if	(<*) > (<(*+10))
+   2789  f95d				  -	      repeat	($100-<*)
+   2790  f95d				  -	      .byte	0
+   2791  f95d				  -	      repend
+   2792  f95d					      endif
+   2793  f95d				   playerL018_0
+   2794  f95d
+   2795  f95d		       3c		      .byte.b	%00111100
+   2796  f95e		       7e		      .byte.b	%01111110
+   2797  f95f		       7e		      .byte.b	%01111110
+   2798  f960		       ff		      .byte.b	%11111111
+   2799  f961		       e7		      .byte.b	%11100111
+   2800  f962		       ff		      .byte.b	%11111111
+   2801  f963		       db		      .byte.b	%11011011
+   2802  f964		       7e		      .byte.b	%01111110
+   2803  f965		       3c		      .byte.b	%00111100
+   2804  f966		       18		      .byte.b	%00011000
+   2805  f967				  -	      if	(<*) > (<(*+10))
+   2806  f967				  -	      repeat	($100-<*)
+   2807  f967				  -	      .byte	0
+   2808  f967				  -	      repend
+   2809  f967					      endif
+   2810  f967				   playerL020_1
+   2811  f967
+   2812  f967		       3c		      .byte.b	%00111100
+   2813  f968		       7e		      .byte.b	%01111110
+   2814  f969		       7e		      .byte.b	%01111110
+   2815  f96a		       ff		      .byte.b	%11111111
+   2816  f96b		       e7		      .byte.b	%11100111
+   2817  f96c		       ff		      .byte.b	%11111111
+   2818  f96d		       db		      .byte.b	%11011011
+   2819  f96e		       7e		      .byte.b	%01111110
+   2820  f96f		       3c		      .byte.b	%00111100
+   2821  f970		       18		      .byte.b	%00011000
+      1579 bytes of ROM space left
+   2822  f970					      echo	"    ",[(scoretable - *)]d , "bytes of ROM space left")
+   2823  f971
+   2824  f971
+   2825  f971
+   2826  f971							; feel free to modify the score graphics - just keep each digit 8 high
+   2827  f971							; and keep the conditional compilation stuff intact
+   2828  f971				  -	      ifconst	ROM2k
+   2829  f971				  -	      ORG	$F7AC
+   2830  f971					      else
+   2831  f971				  -	      ifconst	bankswitch
+   2832  f971				  -	      if	bankswitch == 8
+   2833  f971				  -	      ORG	$2F94-bscode_length
+   2834  f971				  -	      RORG	$FF94-bscode_length
+   2835  f971				  -	      endif
+   2836  f971				  -	      if	bankswitch == 16
+   2837  f971				  -	      ORG	$4F94-bscode_length
+   2838  f971				  -	      RORG	$FF94-bscode_length
+   2839  f971				  -	      endif
+   2840  f971				  -	      if	bankswitch == 32
+   2841  f971				  -	      ORG	$8F94-bscode_length
+   2842  f971				  -	      RORG	$FF94-bscode_length
+   2843  f971				  -	      endif
+   2844  f971					      else
+   2845  ff9c					      ORG	$FF9C
+   2846  ff9c					      endif
+   2847  ff9c					      endif
+   2848  ff9c
+   2849  ff9c
+   2850  ff9c				   scoretable
+   2851  ff9c		       3c		      .byte.b	%00111100
+   2852  ff9d		       66		      .byte.b	%01100110
+   2853  ff9e		       66		      .byte.b	%01100110
+   2854  ff9f		       66		      .byte.b	%01100110
+   2855  ffa0		       66		      .byte.b	%01100110
+   2856  ffa1		       66		      .byte.b	%01100110
+   2857  ffa2		       66		      .byte.b	%01100110
+   2858  ffa3		       3c		      .byte.b	%00111100
+   2859  ffa4
+   2860  ffa4		       7e		      .byte.b	%01111110
+   2861  ffa5		       18		      .byte.b	%00011000
+   2862  ffa6		       18		      .byte.b	%00011000
+   2863  ffa7		       18		      .byte.b	%00011000
+   2864  ffa8		       18		      .byte.b	%00011000
+   2865  ffa9		       38		      .byte.b	%00111000
+   2866  ffaa		       18		      .byte.b	%00011000
+   2867  ffab		       08		      .byte.b	%00001000
+   2868  ffac
+   2869  ffac		       7e		      .byte.b	%01111110
+   2870  ffad		       60		      .byte.b	%01100000
+   2871  ffae		       60		      .byte.b	%01100000
+   2872  ffaf		       3c		      .byte.b	%00111100
+   2873  ffb0		       06		      .byte.b	%00000110
+   2874  ffb1		       06		      .byte.b	%00000110
+   2875  ffb2		       46		      .byte.b	%01000110
+   2876  ffb3		       3c		      .byte.b	%00111100
+   2877  ffb4
+   2878  ffb4		       3c		      .byte.b	%00111100
+   2879  ffb5		       46		      .byte.b	%01000110
+   2880  ffb6		       06		      .byte.b	%00000110
+   2881  ffb7		       06		      .byte.b	%00000110
+   2882  ffb8		       1c		      .byte.b	%00011100
+   2883  ffb9		       06		      .byte.b	%00000110
+   2884  ffba		       46		      .byte.b	%01000110
+   2885  ffbb		       3c		      .byte.b	%00111100
+   2886  ffbc
+   2887  ffbc		       0c		      .byte.b	%00001100
+   2888  ffbd		       0c		      .byte.b	%00001100
+   2889  ffbe		       7e		      .byte.b	%01111110
+   2890  ffbf		       4c		      .byte.b	%01001100
+   2891  ffc0		       4c		      .byte.b	%01001100
+   2892  ffc1		       2c		      .byte.b	%00101100
+   2893  ffc2		       1c		      .byte.b	%00011100
+   2894  ffc3		       0c		      .byte.b	%00001100
+   2895  ffc4
+   2896  ffc4		       3c		      .byte.b	%00111100
+   2897  ffc5		       46		      .byte.b	%01000110
+   2898  ffc6		       06		      .byte.b	%00000110
+   2899  ffc7		       06		      .byte.b	%00000110
+   2900  ffc8		       3c		      .byte.b	%00111100
+   2901  ffc9		       60		      .byte.b	%01100000
+   2902  ffca		       60		      .byte.b	%01100000
+   2903  ffcb		       7e		      .byte.b	%01111110
+   2904  ffcc
+   2905  ffcc		       3c		      .byte.b	%00111100
+   2906  ffcd		       66		      .byte.b	%01100110
+   2907  ffce		       66		      .byte.b	%01100110
+   2908  ffcf		       66		      .byte.b	%01100110
+   2909  ffd0		       7c		      .byte.b	%01111100
+   2910  ffd1		       60		      .byte.b	%01100000
+   2911  ffd2		       62		      .byte.b	%01100010
+   2912  ffd3		       3c		      .byte.b	%00111100
+   2913  ffd4
+   2914  ffd4		       30		      .byte.b	%00110000
+   2915  ffd5		       30		      .byte.b	%00110000
+   2916  ffd6		       30		      .byte.b	%00110000
+   2917  ffd7		       18		      .byte.b	%00011000
+   2918  ffd8		       0c		      .byte.b	%00001100
+   2919  ffd9		       06		      .byte.b	%00000110
+   2920  ffda		       42		      .byte.b	%01000010
+   2921  ffdb		       3e		      .byte.b	%00111110
+   2922  ffdc
+   2923  ffdc		       3c		      .byte.b	%00111100
+   2924  ffdd		       66		      .byte.b	%01100110
+   2925  ffde		       66		      .byte.b	%01100110
+   2926  ffdf		       66		      .byte.b	%01100110
+   2927  ffe0		       3c		      .byte.b	%00111100
+   2928  ffe1		       66		      .byte.b	%01100110
+   2929  ffe2		       66		      .byte.b	%01100110
+   2930  ffe3		       3c		      .byte.b	%00111100
+   2931  ffe4
+   2932  ffe4		       3c		      .byte.b	%00111100
+   2933  ffe5		       46		      .byte.b	%01000110
+   2934  ffe6		       06		      .byte.b	%00000110
+   2935  ffe7		       3e		      .byte.b	%00111110
+   2936  ffe8		       66		      .byte.b	%01100110
+   2937  ffe9		       66		      .byte.b	%01100110
+   2938  ffea		       66		      .byte.b	%01100110
+   2939  ffeb		       3c		      .byte.b	%00111100
+   2940  ffec
+   2941  ffec
+   2942  ffec				  -	      ifconst	ROM2k
+   2943  ffec				  -	      ORG	$F7FC
+   2944  ffec					      else
+   2945  ffec				  -	      ifconst	bankswitch
+   2946  ffec				  -	      if	bankswitch == 8
+   2947  ffec				  -	      ORG	$2FF4-bscode_length
+   2948  ffec				  -	      RORG	$FFF4-bscode_length
+   2949  ffec				  -	      endif
+   2950  ffec				  -	      if	bankswitch == 16
+   2951  ffec				  -	      ORG	$4FF4-bscode_length
+   2952  ffec				  -	      RORG	$FFF4-bscode_length
+   2953  ffec				  -	      endif
+   2954  ffec				  -	      if	bankswitch == 32
+   2955  ffec				  -	      ORG	$8FF4-bscode_length
+   2956  ffec				  -	      RORG	$FFF4-bscode_length
+   2957  ffec				  -	      endif
+   2958  ffec					      else
+   2959  fffc					      ORG	$FFFC
+   2960  fffc					      endif
+   2961  fffc					      endif
+   2962  fffc				  -	      ifconst	bankswitch
+   2963  fffc				  -	      if	bankswitch == 8
+   2964  fffc				  -	      ORG	$2FFC
+   2965  fffc				  -	      RORG	$FFFC
+   2966  fffc				  -	      endif
+   2967  fffc				  -	      if	bankswitch == 16
+   2968  fffc				  -	      ORG	$4FFC
+   2969  fffc				  -	      RORG	$FFFC
+   2970  fffc				  -	      endif
+   2971  fffc				  -	      if	bankswitch == 32
+   2972  fffc				  -	      ORG	$8FFC
+   2973  fffc				  -	      RORG	$FFFC
+   2974  fffc				  -	      endif
+   2975  fffc					      else
+   2976  fffc				  -	      ifconst	ROM2k
+   2977  fffc				  -	      ORG	$F7FC
+   2978  fffc					      else
+   2979  fffc					      ORG	$FFFC
+   2980  fffc					      endif
+   2981  fffc					      endif
+   2982  fffc		       4e f2		      .word.w	start
+   2983  fffe		       4e f2		      .word.w	start

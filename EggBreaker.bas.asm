@@ -1525,223 +1525,279 @@ scorepointerset
  tax
  sbx #<(256-<scoretable)
  rts
+; y and a contain multiplicands, result in a
+
+mul8
+ sty temp1
+ sta temp2
+ lda #0
+reptmul8
+ lsr temp2
+ bcc skipmul8
+ clc
+ adc temp1
+;bcs donemul8 might save cycles?
+skipmul8
+;beq donemul8 might save cycles?
+ asl temp1
+ bne reptmul8
+donemul8
+ RETURN
+
+div8
+ ; a=numerator y=denominator, result in a
+ cpy #2
+ bcc div8end+1;div by 0 = bad, div by 1=no calc needed, so bail out
+ sty temp1
+ ldy #$ff
+div8loop
+ sbc temp1
+ iny
+ bcs div8loop
+div8end
+ tya
+ ; result in a
+ RETURN
 game
 .L00 ;  rem **********************************
 
 .L01 ;  rem Egg Breaker
 
-.L02 ;  rem LMC 2700
+.L02 ;  rem 
 
-.L03 ;  rem Project 6
+.L03 ;  rem Humpty Dumpty has a neighbor he doesn't like 
 
-.L04 ;  rem Lilliann Andrews, Sranee Bayapureddy, David Le
+.L04 ;  rem There's a wall between them like fences for human 
 
-.L05 ;  rem **********************************
+.L05 ;  rem  neighbors. Get your ball past them to win a point
 
-.
- ; 
+.L06 ;  rem  and have your ball hit the other egg to win 10 points
 
-.L06 ;  set romsize 4k
+.L07 ;  rem 
 
-.L07 ;  set kernel_options pfcolors
+.L08 ;  rem LMC 2700
 
-.
- ; 
+.L09 ;  rem Project 6
 
-.L08 ;  rem setting colors for the playfield's rows
+.L010 ;  rem Lilliann Andrews, Sranee Bayapureddy, David Le
 
-.L09 ;  pfcolors:
+.L011 ;  rem **********************************
 
- lda # $00
- sta COLUPF
- ifconst pfres
- lda #>(pfcolorlabel13-132+pfres*pfwidth)
- else
- lda #>(pfcolorlabel13-84)
- endif
- sta pfcolortable+1
- ifconst pfres
- lda #<(pfcolorlabel13-132+pfres*pfwidth)
- else
- lda #<(pfcolorlabel13-84)
- endif
- sta pfcolortable
-.
- ; 
+.L012 ;  include div_mul.asm
 
-.L010 ;  player0color:
+.L013 ;  rem include fixed_point_math.asm
 
-	LDA #<playercolorL010_0
+.L014 ;  set legacy
 
-	STA player0color
-	LDA #>playercolorL010_0
+.L015 ;  set romsize 4k
 
-	STA player0color+1
-.
- ; 
+.L016 ;  pfclear
 
-.L011 ;  player1color:
+	LDA #0
+ jsr pfclear
+.L017 ;  player0x = 2 : player0y = 52
 
-	LDA #<playercolorL011_1
+	LDA #2
+	STA player0x
+	LDA #52
+	STA player0y
+.L018 ;  player0:
 
-	STA player1color
-	LDA #>playercolorL011_1
-
-	STA player1color+1
-.
- ; 
-
-.L012 ;  rem drawing the playfield
-
-.L013 ;  playfield:
-
-  ifconst pfres
-	  ldx #(9>pfres)*(pfres*pfwidth-1)+(9<=pfres)*35
-  else
-	  ldx #35
-  endif
-	jmp pflabel0
-PF_data0
-	.byte %00000000, %00000000, %00000000, %00000000
-	.byte %00000000, %00000000, %00000000, %00000000
-	.byte %11011011, %10110110, %10110110, %11011011
-	.byte %11011011, %10110110, %10110110, %11011011
-	.byte %11011011, %10110110, %10110110, %11011011
-	.byte %11011011, %10110110, %10110110, %11011011
-	.byte %00000000, %00000000, %00000000, %00000000
-	.byte %00000000, %00000000, %00000000, %00000000
-	.byte %00000000, %00000000, %00000000, %00000000
-pflabel0
-	lda PF_data0,x
-	sta playfield,x
-	dex
-	bpl pflabel0
-.
- ; 
-
-.L014 ;  rem defining the player
-
-.L015 ;  player0:
-
-	LDA #<playerL015_0
+	LDA #<playerL018_0
 
 	STA player0pointerlo
-	LDA #>playerL015_0
+	LDA #>playerL018_0
 
 	STA player0pointerhi
-	LDA #1
+	LDA #9
 	STA player0height
-.
- ; 
+.L019 ;  player1x = 158 : player1y = 52
 
-.L016 ;  player1:
+	LDA #158
+	STA player1x
+	LDA #52
+	STA player1y
+.L020 ;  player1:
 
-	LDA #<playerL016_1
+	LDA #<playerL020_1
 
 	STA player1pointerlo
-	LDA #>playerL016_1
+	LDA #>playerL020_1
 
 	STA player1pointerhi
-	LDA #7
+	LDA #9
 	STA player1height
 .
  ; 
 
-.L017 ;  dim xDirection  =  1
+.L021 ;  scorecolor  =  60
 
-.L018 ;  dim yDirection  =  1
+	LDA #60
+	STA scorecolor
+.L022 ;  dim missile0dx  =  a
 
-.
- ; 
+.L023 ;  dim missile0dy  =  b
 
-.L019 ;  dim missile0dx  =  a
+.L024 ;  dim missile1dx  =  c
 
-.L020 ;  dim missile0dy  =  b
+.L025 ;  dim missile1dy  =  d
 
-.L021 ;  dim pixelX  =  c
+.L026 ;  dim tempx  =  e
 
-.L022 ;  dim pixelY  =  d
+.L027 ;  dim tempy  =  f
 
+.L028 ;  dim musicPointer  =  g
+
+.L029 ;  dim musicTimer  =  h
+
+.L030 ;  dim tempaudv  =  i
+
+.L031 ;  dim musicDist  =  j
+
+.L032 ;  dim soundTimer  =  k
+
+.L033 ;  dim randCountDown  =  l
+
+.L034 ;  randCountDown  =  30
+
+	LDA #30
+	STA randCountDown
+.L035 ;  musicPointer = $FF
+
+	LDA #$FF
+	STA musicPointer
+.L036 ;  musicTimer = 0
+
+	LDA #0
+	STA musicTimer
+.L037 ;  AUDV0 = 0
+
+	LDA #0
+	STA AUDV0
+.L038 ;  AUDC0 = 4
+
+	LDA #4
+	STA AUDC0
+.L039 ;  AUDV1 = 0
+
+	LDA #0
+	STA AUDV1
+.L040 ;  AUDC1 = 14
+
+	LDA #14
+	STA AUDC1
 .
  ; 
 
 .startgame
  ; startgame
 
-.L023 ;  player0x  =  75
+.L041 ;  player0x = 2 : player0y = 52
 
-	LDA #75
+	LDA #2
 	STA player0x
-.L024 ;  player0y  = 88
-
-	LDA #88
+	LDA #52
 	STA player0y
-.
- ; 
+.L042 ;  player1x = 158 : player1y = 52
 
-.L025 ;  player1x  =  30
-
-	LDA #30
+	LDA #158
 	STA player1x
-.L026 ;  player1y  =  16
-
-	LDA #16
+	LDA #52
 	STA player1y
-.
- ; 
+.L043 ;  missile0x = 40
 
-.L027 ;  missile0x = 80
-
-	LDA #80
+	LDA #40
 	STA missile0x
-.L028 ;  missile0y = 70
+.L044 ;  missile0y = 44
 
-	LDA #70
+	LDA #44
 	STA missile0y
-.L029 ;  missile0dx  =  0
+.L045 ;  missile0dx  =  0
 
 	LDA #0
 	STA missile0dx
-.L030 ;  missile0dy  =  0
+.L046 ;  missile0dy  =  0
 
 	LDA #0
 	STA missile0dy
-.L031 ;  missile0height =  1
+.L047 ;  missile1x = 150
 
-	LDA #1
-	STA missile0height
+	LDA #150
+	STA missile1x
+.L048 ;  missile1y = 44
+
+	LDA #44
+	STA missile1y
+.L049 ;  missile1dx  =  0
+
+	LDA #0
+	STA missile1dx
+.L050 ;  missile1dy  =  0
+
+	LDA #0
+	STA missile1dy
 .
  ; 
 
-.L032 ;  rem displays the screen
+.drawborders
+ ; drawborders
 
-.draw_loop
- ; draw_loop
+.L051 ;  pfvline 14 0 11 on
 
-.L033 ;  rem color of background
+	LDA #11
+	STA temp3
+	LDA #14
+	LDY #0
+	LDX #0
+ jsr pfvline
+.L052 ;  pfvline 15 0 11 on
 
-.L034 ;  COLUBK  =  $9E
+	LDA #11
+	STA temp3
+	LDA #15
+	LDY #0
+	LDX #0
+ jsr pfvline
+.L053 ;  pfvline 16 0 11 on
 
-	LDA #$9E
-	STA COLUBK
-.L035 ;  COLUP0  =  14
+	LDA #11
+	STA temp3
+	LDA #16
+	LDY #0
+	LDX #0
+ jsr pfvline
+.
+ ; 
+
+.
+ ; 
+
+.gameloop
+ ; gameloop
+
+.L054 ;  COLUP0  =  14
 
 	LDA #14
 	STA COLUP0
-.L036 ;  COLUP1  =  14
+.L055 ;  COLUP1  =  14
 
 	LDA #14
 	STA COLUP1
-.
- ; 
+.L056 ;  COLUPF  =  64
 
-.L037 ;  drawscreen
+	LDA #64
+	STA COLUPF
+.L057 ;  COLUBK  =  70
+
+	LDA #70
+	STA COLUBK
+.L058 ;  drawscreen
 
  jsr drawscreen
-.L038 ;  if joy0fire  &&  missile0dx  =  0 then gosub startball0
+.L059 ;  if joy0fire  &&  missile0dx  =  0 then gosub startball0
 
  bit INPT4
-	BMI .skipL038
+	BMI .skipL059
 .condpart0
 	LDA missile0dx
 	CMP #0
@@ -1750,200 +1806,859 @@ pflabel0
  jsr .startball0
 
 .skip0then
-.skipL038
-.L039 ;  if joy0right then player0x  =  player0x  +  1 :  if player0x  >  153 then player0x  =  153 :  xDirection  =  1
+.skipL059
+.L060 ;  if joy0up then player0y  =  player0y  -  2 :  if player0y  <  16 then player0y  =  16
 
+ lda #$10
  bit SWCHA
-	BMI .skipL039
+	BNE .skipL060
 .condpart2
-	INC player0x
-	LDA #153
-	CMP player0x
+	LDA player0y
+	SEC
+	SBC #2
+	STA player0y
+	LDA player0y
+	CMP #16
      BCS .skip2then
 .condpart3
-	LDA #153
-	STA player0x
-	LDA #1
-	STA xDirection
+	LDA #16
+	STA player0y
 .skip2then
-.skipL039
-.L040 ;  if joy0left then player0x  =  player0x  -  1 :  if player0x  <  1 then player0x  =  2 :  xDirection  =   - 1
+.skipL060
+.L061 ;  if joy0down then player0y  =  player0y  +  2 :  if player0y  >  88 then player0y  =  88
 
+ lda #$20
  bit SWCHA
-	BVS .skipL040
+	BNE .skipL061
 .condpart4
-	DEC player0x
-	LDA player0x
-	CMP #1
+	LDA player0y
+	CLC
+	ADC #2
+	STA player0y
+	LDA #88
+	CMP player0y
      BCS .skip4then
 .condpart5
-	LDA #2
-	STA player0x
-	LDA #255
-	STA xDirection
+	LDA #88
+	STA player0y
 .skip4then
-.skipL040
-.L041 ;  missile0x  =  missile0x  +  missile0dx
+.skipL061
+.L062 ;  if joy1fire  &&  missile1dx  =  0 then gosub startball1
+
+ bit INPT5
+	BMI .skipL062
+.condpart6
+	LDA missile1dx
+	CMP #0
+     BNE .skip6then
+.condpart7
+ jsr .startball1
+
+.skip6then
+.skipL062
+.L063 ;  if joy1up then player1y  =  player1y  -  2 :  if player1y  <  16 then player1y  =  16
+
+ lda #1
+ bit SWCHA
+	BNE .skipL063
+.condpart8
+	LDA player1y
+	SEC
+	SBC #2
+	STA player1y
+	LDA player1y
+	CMP #16
+     BCS .skip8then
+.condpart9
+	LDA #16
+	STA player1y
+.skip8then
+.skipL063
+.L064 ;  if joy1down then player1y  =  player1y  +  2 :  if player1y  >  88 then player1y  =  88
+
+ lda #2
+ bit SWCHA
+	BNE .skipL064
+.condpart10
+	LDA player1y
+	CLC
+	ADC #2
+	STA player1y
+	LDA #88
+	CMP player1y
+     BCS .skip10then
+.condpart11
+	LDA #88
+	STA player1y
+.skip10then
+.skipL064
+.L065 ;  missile0x  =  missile0x  +  missile0dx
 
 	LDA missile0x
 	CLC
 	ADC missile0dx
 	STA missile0x
-.L042 ;  missile0y  =  missile0y  +  missile0dy
+.L066 ;  missile1x  =  missile1x  +  missile1dx
+
+	LDA missile1x
+	CLC
+	ADC missile1dx
+	STA missile1x
+.L067 ;  missile0y  =  missile0y  +  missile0dy
 
 	LDA missile0y
 	CLC
 	ADC missile0dy
 	STA missile0y
-.L043 ;  if missile0y  >=  88 then goto startgame
+.L068 ;  missile1y  =  missile1y  +  missile1dy
 
-	LDA missile0y
-	CMP #88
-     BCC .skipL043
-.condpart6
- jmp .startgame
+	LDA missile1y
+	CLC
+	ADC missile1dy
+	STA missile1y
+.L069 ;  rem PADDLE COLLISIONS
 
-.skipL043
-.L044 ;  rem COLLISIONS
-
-.L045 ;  if collision(player0,missile0) then gosub collidep0b0
+.L070 ;  if collision(player1,missile0) then soundTimer  =  16
 
 	BIT CXM0P
-	BVC .skipL045
-.condpart7
+	BPL .skipL070
+.condpart12
+	LDA #16
+	STA soundTimer
+.skipL070
+.L071 ;  if collision(player1,missile0) then gosub collidep1b0
+
+	BIT CXM0P
+	BPL .skipL071
+.condpart13
+ jsr .collidep1b0
+
+.skipL071
+.L072 ;  if collision(player0,missile0) then soundTimer  =  16
+
+	BIT CXM0P
+	BVC .skipL072
+.condpart14
+	LDA #16
+	STA soundTimer
+.skipL072
+.L073 ;  if collision(player0,missile0) then gosub collidep0b0
+
+	BIT CXM0P
+	BVC .skipL073
+.condpart15
  jsr .collidep0b0
 
-.skipL045
-.L046 ;  if missile0y  <= 01 then missile0dy =  - missile0dy
+.skipL073
+.L074 ;  if collision(player1,missile1) then soundTimer  =  16
 
-	LDA #01
+	BIT CXM1P
+	BVC .skipL074
+.condpart16
+	LDA #16
+	STA soundTimer
+.skipL074
+.L075 ;  if collision(player1,missile1) then gosub collidep1b1
+
+	BIT CXM1P
+	BVC .skipL075
+.condpart17
+ jsr .collidep1b1
+
+.skipL075
+.L076 ;  if collision(player0,missile1) then soundTimer  =  16
+
+	BIT CXM1P
+	BPL .skipL076
+.condpart18
+	LDA #16
+	STA soundTimer
+.skipL076
+.L077 ;  if collision(player0,missile1) then gosub collidep0b1
+
+	BIT CXM1P
+	BPL .skipL077
+.condpart19
+ jsr .collidep0b1
+
+.skipL077
+.L078 ;  rem VERTICAL BORDER COLLISION
+
+.L079 ;  if missile0y  <=  1 then missile0dy = # - missile0dy
+
+	LDA #1
 	CMP missile0y
-     BCC .skipL046
-.condpart8
-	LDA #0
+     BCC .skipL079
+.condpart20
+	LDA ##
 	SEC
 	SBC missile0dy
 	STA missile0dy
-.skipL046
-.L047 ;  if collision(missile0,playfield) then gosub pixelcollide0
-
-	BIT CXM0FB
-	BPL .skipL047
-.condpart9
- jsr .pixelcollide0
-
-.skipL047
-.L048 ;  if missile0x  <= 1 then missile0dx =  - missile0dx
+.skipL079
+.L080 ;  if missile0y  <=  1 then missile0y = 1
 
 	LDA #1
-	CMP missile0x
-     BCC .skipL048
-.condpart10
-	LDA #0
+	CMP missile0y
+     BCC .skipL080
+.condpart21
+	LDA #1
+	STA missile0y
+.skipL080
+.L081 ;  if missile1y  <=  1 then missile1dy = # - missile1dy
+
+	LDA #1
+	CMP missile1y
+     BCC .skipL081
+.condpart22
+	LDA ##
 	SEC
-	SBC missile0dx
-	STA missile0dx
-.skipL048
-.L049 ;  if missile0x  >= 153 then missile0dx =  - missile0dx
+	SBC missile1dy
+	STA missile1dy
+.skipL081
+.L082 ;  if missile1y  <=  1 then missile1y = 1
+
+	LDA #1
+	CMP missile1y
+     BCC .skipL082
+.condpart23
+	LDA #1
+	STA missile1y
+.skipL082
+.L083 ;  if missile0y  >=  88 then missile0dy =  # - missile0dy
+
+	LDA missile0y
+	CMP #88
+     BCC .skipL083
+.condpart24
+	LDA ##
+	SEC
+	SBC missile0dy
+	STA missile0dy
+.skipL083
+.L084 ;  if missile0y  >=  88 then missile0y = 88
+
+	LDA missile0y
+	CMP #88
+     BCC .skipL084
+.condpart25
+	LDA #88
+	STA missile0y
+.skipL084
+.L085 ;  if missile1y  >=  88 then missile1dy =  # - missile1dy
+
+	LDA missile1y
+	CMP #88
+     BCC .skipL085
+.condpart26
+	LDA ##
+	SEC
+	SBC missile1dy
+	STA missile1dy
+.skipL085
+.L086 ;  if missile1y  >=  88 then missile1y = 88
+
+	LDA missile1y
+	CMP #88
+     BCC .skipL086
+.condpart27
+	LDA #88
+	STA missile1y
+.skipL086
+.L087 ;  rem HORIZONTAL BORDER COLLISION
+
+.L088 ;  if missile0x  <=  16 then goto player2win
+
+	LDA #16
+	CMP missile0x
+     BCC .skipL088
+.condpart28
+ jmp .player2win
+
+.skipL088
+.L089 ;  if missile0x  >=  175 then goto player1win
 
 	LDA missile0x
-	CMP #153
-     BCC .skipL049
-.condpart11
+	CMP #175
+     BCC .skipL089
+.condpart29
+ jmp .player1win
+
+.skipL089
+.L090 ;  if missile1x  <=  16 then goto player2win
+
+	LDA #16
+	CMP missile1x
+     BCC .skipL090
+.condpart30
+ jmp .player2win
+
+.skipL090
+.L091 ;  if missile1x  >=  175 then goto player1win
+
+	LDA missile1x
+	CMP #175
+     BCC .skipL091
+.condpart31
+ jmp .player1win
+
+.skipL091
+.L092 ;  rem BLOCK COLLISION
+
+.
+ ; 
+
+.L093 ;  if collision(missile0,playfield) then gosub pixelcollide0
+
+	BIT CXM0FB
+	BPL .skipL093
+.condpart32
+ jsr .pixelcollide0
+
+.skipL093
+.L094 ;  if collision(missile1,playfield) then gosub pixelcollide1
+
+	BIT CXM1FB
+	BPL .skipL094
+.condpart33
+ jsr .pixelcollide1
+
+.skipL094
+.
+ ; 
+
+.L095 ;  rem MUSIC
+
+.L096 ;  if musicTimer  <= 1 then gosub changeMusicNote
+
+	LDA #1
+	CMP musicTimer
+     BCC .skipL096
+.condpart34
+ jsr .changeMusicNote
+
+.skipL096
+.L097 ;  musicTimer  =  musicTimer  -  1
+
+	DEC musicTimer
+.L098 ;  if soundTimer  >  0 then AUDF1  =  26
+
 	LDA #0
-	SEC
-	SBC missile0dx
-	STA missile0dx
-.skipL049
-.
- ; 
+	CMP soundTimer
+     BCS .skipL098
+.condpart35
+	LDA #26
+	STA AUDF1
+.skipL098
+.L099 ;  if soundTimer  >  0 then AUDV1  =  5
+
+	LDA #0
+	CMP soundTimer
+     BCS .skipL099
+.condpart36
+	LDA #5
+	STA AUDV1
+.skipL099
+.L0100 ;  if soundTimer  >=  1 then soundTimer  =  soundTimer  -  1 else AUDV1  =  0
+
+	LDA soundTimer
+	CMP #1
+     BCC .skipL0100
+.condpart37
+	DEC soundTimer
+ jmp .skipelse0
+.skipL0100
+	LDA #0
+	STA AUDV1
+.skipelse0
+.L0101 ;  goto gameloop
+
+ jmp .gameloop
 
 .
  ; 
 
-.
- ; 
+.L0102 ;  return
 
-.L050 ;  goto draw_loop
-
- jmp .draw_loop
-
+	RTS
 .
  ; 
 
 .pixelcollide0
  ; pixelcollide0
 
-.L051 ;  pixelX  =  missile0x%31
+.L0103 ;  tempy =  ( missile0y )  / 8
 
-	LDA missile0x%31
-	STA pixelX
-.L052 ;  pixelY  =  missile0y%11
+; complex statement detected
+	LDA missile0y
+	lsr
+	lsr
+	lsr
+	STA tempy
+.L0104 ;  tempx  =  missile0x
 
-	LDA missile0y%11
-	STA pixelY
-.L053 ;  pfpixel pixelX pixelY off
+	LDA missile0x
+	STA tempx
+.L0105 ;  if tempx  <=  86 then tempx =  ( missile0x )  / 5  -  4
 
-	LDA pixelX
-	LDY pixelY
+	LDA #86
+	CMP tempx
+     BCC .skipL0105
+.condpart38
+; complex statement detected
+	LDA missile0x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #4
+	STA tempx
+.skipL0105
+.L0106 ;  if tempx  <  96  &&  tempx  >  86 then tempx =  ( missile0x )  / 5  -  3
+
+	LDA tempx
+	CMP #96
+     BCS .skipL0106
+.condpart39
+	LDA #86
+	CMP tempx
+     BCS .skip39then
+.condpart40
+; complex statement detected
+	LDA missile0x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #3
+	STA tempx
+.skip39then
+.skipL0106
+.L0107 ;  if tempx  >=  96  &&  tempx  < 100 then tempx =  ( missile0x )  / 5  -  3
+
+	LDA tempx
+	CMP #96
+     BCC .skipL0107
+.condpart41
+	LDA tempx
+	CMP #100
+     BCS .skip41then
+.condpart42
+; complex statement detected
+	LDA missile0x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #3
+	STA tempx
+.skip41then
+.skipL0107
+.L0108 ;  if tempx  >=  100 then tempx =  ( missile0x )  / 5  -  2
+
+	LDA tempx
+	CMP #100
+     BCC .skipL0108
+.condpart43
+; complex statement detected
+	LDA missile0x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #2
+	STA tempx
+.skipL0108
+.L0109 ;  pfpixel tempx tempy off
+
+	LDA tempx
+	LDY tempy
 	LDX #1
  jsr pfpixel
-.L054 ;  if missile0dx  <  0 then missile0dx  =  1
+.L0110 ;  rem if missile0dx = #-1 then missile0dx = 1
+
+.L0111 ;  if missile0dx  =  1 then missile0dx  =  # - 1 else missile0dx  =  1
 
 	LDA missile0dx
-	CMP #0
-     BCS .skipL054
-.condpart12
-	LDA #1
-	STA missile0dx
-.skipL054
-.L055 ;  if missile0dy  =  1 then missile0dy  =  # - 1 else missile0dx  =  1
-
-	LDA missile0dy
 	CMP #1
-     BNE .skipL055
-.condpart13
+     BNE .skipL0111
+.condpart44
 	LDA ##
 	SEC
 	SBC #1
-	STA missile0dy
- jmp .skipelse0
-.skipL055
+	STA missile0dx
+ jmp .skipelse1
+.skipL0111
 	LDA #1
 	STA missile0dx
-.skipelse0
-.L056 ;  rem missile0dy = #-missile0dy
+.skipelse1
+.L0112 ;  rem missile0dy = #-missile0dy
 
-.return
- ; return
+.L0113 ;  return
 
+	RTS
+.pixelcollide1
+ ; pixelcollide1
+
+.L0114 ;  tempy =  ( missile1y )  / 8
+
+; complex statement detected
+	LDA missile1y
+	lsr
+	lsr
+	lsr
+	STA tempy
+.L0115 ;  tempx  =  missile1x
+
+	LDA missile1x
+	STA tempx
+.L0116 ;  if tempx  <=  86 then tempx =  ( missile1x )  / 5  -  4
+
+	LDA #86
+	CMP tempx
+     BCC .skipL0116
+.condpart45
+; complex statement detected
+	LDA missile1x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #4
+	STA tempx
+.skipL0116
+.L0117 ;  if tempx  <  96  &&  tempx  >  86 then tempx =  ( missile1x )  / 5  -  3
+
+	LDA tempx
+	CMP #96
+     BCS .skipL0117
+.condpart46
+	LDA #86
+	CMP tempx
+     BCS .skip46then
+.condpart47
+; complex statement detected
+	LDA missile1x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #3
+	STA tempx
+.skip46then
+.skipL0117
+.L0118 ;  if tempx  >=  96  &&  tempx  < 100 then tempx =  ( missile1x )  / 5  -  3
+
+	LDA tempx
+	CMP #96
+     BCC .skipL0118
+.condpart48
+	LDA tempx
+	CMP #100
+     BCS .skip48then
+.condpart49
+; complex statement detected
+	LDA missile1x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #3
+	STA tempx
+.skip48then
+.skipL0118
+.L0119 ;  if tempx  >=  100 then tempx =  ( missile1x )  / 5  -  2
+
+	LDA tempx
+	CMP #100
+     BCC .skipL0119
+.condpart50
+; complex statement detected
+	LDA missile1x
+	LDY #5
+ jsr div8
+	SEC
+	SBC #2
+	STA tempx
+.skipL0119
+.L0120 ;  pfpixel tempx tempy off
+
+	LDA tempx
+	LDY tempy
+	LDX #1
+ jsr pfpixel
+.L0121 ;  rem if missile1dx = #-1 then missile1dx = 1
+
+.L0122 ;  if missile1dx  =  1 then missile1dx  =  # - 1 else missile1dx  =  1
+
+	LDA missile1dx
+	CMP #1
+     BNE .skipL0122
+.condpart51
+	LDA ##
+	SEC
+	SBC #1
+	STA missile1dx
+ jmp .skipelse2
+.skipL0122
+	LDA #1
+	STA missile1dx
+.skipelse2
+.L0123 ;  rem missile1dy = #-missile1dy
+
+.L0124 ;  return
+
+	RTS
 .
  ; 
 
 .collidep0b0
  ; collidep0b0
 
-.L057 ;  if missile0dx  <=  0 then missile0dx  =  1 :  if missile0dx  >  0 then missile0dx  =   - 1
+.L0125 ;  z  =  player0y  -  missile0y
 
-	LDA #0
-	CMP missile0dx
-     BCC .skipL057
-.condpart14
+	LDA player0y
+	SEC
+	SBC missile0y
+	STA z
+.L0126 ;  z  =  z / 4
+
+	LDA z
+	lsr
+	lsr
+	STA z
+.L0127 ;  if z  >=  2 then missile0dy  =  # - 1
+
+	LDA z
+	CMP #2
+     BCC .skipL0127
+.condpart52
+	LDA ##
+	SEC
+	SBC #1
+	STA missile0dy
+.skipL0127
+.L0128 ;  if z  <=  1 then missile0dy  =  1
+
+	LDA #1
+	CMP z
+     BCC .skipL0128
+.condpart53
+	LDA #1
+	STA missile0dy
+.skipL0128
+.L0129 ;  missile0dx  =  1
+
 	LDA #1
 	STA missile0dx
-	LDA #0
-	CMP missile0dx
-     BCS .skip14then
-.condpart15
-	LDA #255
-	STA missile0dx
-.skip14then
-.skipL057
-.L058 ;  missile0dy  =   - 1
+.L0130 ;  missile0x  =  missile0x  +  missile0dx
 
-	LDA #255
+	LDA missile0x
+	CLC
+	ADC missile0dx
+	STA missile0x
+.L0131 ;  missile0y  =  missile0y  +  missile0dy
+
+	LDA missile0y
+	CLC
+	ADC missile0dy
+	STA missile0y
+.L0132 ;  return
+
+	RTS
+.
+ ; 
+
+.collidep1b0
+ ; collidep1b0
+
+.L0133 ;  z  =  player1y  -  missile0y
+
+	LDA player1y
+	SEC
+	SBC missile0y
+	STA z
+.L0134 ;  z  =  z / 4
+
+	LDA z
+	lsr
+	lsr
+	STA z
+.L0135 ;  if z  >=  2 then missile0dy  =  # - 1
+
+	LDA z
+	CMP #2
+     BCC .skipL0135
+.condpart54
+	LDA ##
+	SEC
+	SBC #1
 	STA missile0dy
-.L059 ;  return
+.skipL0135
+.L0136 ;  if z  <=  1 then missile0dy  =  1
+
+	LDA #1
+	CMP z
+     BCC .skipL0136
+.condpart55
+	LDA #1
+	STA missile0dy
+.skipL0136
+.L0137 ;  missile0dx  =  # - 1
+
+	LDA ##
+	SEC
+	SBC #1
+	STA missile0dx
+.L0138 ;  missile0x  =  missile0x  +  missile0dx
+
+	LDA missile0x
+	CLC
+	ADC missile0dx
+	STA missile0x
+.L0139 ;  missile0y  =  missile0y  +  missile0dy
+
+	LDA missile0y
+	CLC
+	ADC missile0dy
+	STA missile0y
+.L0140 ;  score  =  score  +  10000
+
+	SED
+	CLC
+	LDA score
+	ADC #$01
+	STA score
+	CLD
+.L0141 ;  return
+
+	RTS
+.
+ ; 
+
+.collidep0b1
+ ; collidep0b1
+
+.L0142 ;  z  =  player0y  -  missile1y
+
+	LDA player0y
+	SEC
+	SBC missile1y
+	STA z
+.L0143 ;  z  =  z / 4
+
+	LDA z
+	lsr
+	lsr
+	STA z
+.
+ ; 
+
+.L0144 ;  if z  >=  2 then missile1dy  =  # - 1
+
+	LDA z
+	CMP #2
+     BCC .skipL0144
+.condpart56
+	LDA ##
+	SEC
+	SBC #1
+	STA missile1dy
+.skipL0144
+.L0145 ;  if z  <=  1 then missile1dy  =  1
+
+	LDA #1
+	CMP z
+     BCC .skipL0145
+.condpart57
+	LDA #1
+	STA missile1dy
+.skipL0145
+.L0146 ;  missile1dx  =  1
+
+	LDA #1
+	STA missile1dx
+.L0147 ;  missile1x  =  missile1x  +  missile1dx
+
+	LDA missile1x
+	CLC
+	ADC missile1dx
+	STA missile1x
+.L0148 ;  missile1y  =  missile1y  +  missile1dy
+
+	LDA missile1y
+	CLC
+	ADC missile1dy
+	STA missile1y
+.L0149 ;  score  =  score  +  10
+
+	SED
+	CLC
+	LDA score+2
+	ADC #$10
+	STA score+2
+	LDA score+1
+	ADC #$00
+	STA score+1
+	LDA score
+	ADC #$00
+	STA score
+	CLD
+.L0150 ;  return
+
+	RTS
+.
+ ; 
+
+.collidep1b1
+ ; collidep1b1
+
+.L0151 ;  z  =  player1y  -  missile1y
+
+	LDA player1y
+	SEC
+	SBC missile1y
+	STA z
+.L0152 ;  z  =  z / 4
+
+	LDA z
+	lsr
+	lsr
+	STA z
+.
+ ; 
+
+.L0153 ;  if z  >=  2 then missile1dy  =  # - 1
+
+	LDA z
+	CMP #2
+     BCC .skipL0153
+.condpart58
+	LDA ##
+	SEC
+	SBC #1
+	STA missile1dy
+.skipL0153
+.L0154 ;  if z  <=  1 then missile1dy  =  1
+
+	LDA #1
+	CMP z
+     BCC .skipL0154
+.condpart59
+	LDA #1
+	STA missile1dy
+.skipL0154
+.L0155 ;  missile1dx  =  # - 1
+
+	LDA ##
+	SEC
+	SBC #1
+	STA missile1dx
+.L0156 ;  missile1x  =  missile1x  +  missile1dx
+
+	LDA missile1x
+	CLC
+	ADC missile1dx
+	STA missile1x
+.L0157 ;  missile1y  =  missile1y  +  missile1dy
+
+	LDA missile1y
+	CLC
+	ADC missile1dy
+	STA missile1y
+.L0158 ;  return
 
 	RTS
 .
@@ -1952,100 +2667,158 @@ pflabel0
 .startball0
  ; startball0
 
-.L060 ;  missile0dy  =  1
+.L0159 ;  missile0dx  =  # - 1
+
+	LDA ##
+	SEC
+	SBC #1
+	STA missile0dx
+.L0160 ;  return
+
+	RTS
+.
+ ; 
+
+.startball1
+ ; startball1
+
+.L0161 ;  missile1dx  =  1
 
 	LDA #1
-	STA missile0dy
-.L061 ;  missile0dx  =  0
+	STA missile1dx
+.L0162 ;  return
 
-	LDA #0
-	STA missile0dx
-.L062 ;  return
 	RTS
- ifconst pfres
- if (<*) > (254-pfres*pfwidth)
-	align 256
-	endif
- if (<*) < (136-pfres*pfwidth)
-	repeat ((136-pfres*pfwidth)-(<*))
-	.byte 0
-	repend
-	endif
- else
- if (<*) > 206
-	align 256
-	endif
- if (<*) < 88
-	repeat (88-(<*))
-	.byte 0
-	repend
-	endif
- endif
-pfcolorlabel13
- .byte  $00,0,0,0
- .byte  $40,0,0,0
- .byte  $40,0,0,0
- .byte  $40,0,0,0
- .byte  $40,0,0,0
- .byte  $40,0,0,0
- .byte  $40,0,0,0
- .byte  $00,0,0,0
- .byte  $00,0,0,0
- .byte  $00,0,0,0
- if (<*) > (<(*+8))
+.
+ ; 
+
+.playsound
+ ; playsound
+
+.L0163 ;  AUDV1  =  8
+
+	LDA #8
+	STA AUDV1
+.L0164 ;  soundTimer  =  10
+
+	LDA #10
+	STA soundTimer
+.L0165 ;  return
+
+	RTS
+.
+ ; 
+
+.player1win
+ ; player1win
+
+.L0166 ;  score  =  score  +  1000
+
+	SED
+	CLC
+	LDA score+1
+	ADC #$10
+	STA score+1
+	LDA score
+	ADC #$00
+	STA score
+	CLD
+.L0167 ;  goto startgame
+
+ jmp .startgame
+
+.
+ ; 
+
+.player2win
+ ; player2win
+
+.L0168 ;  score  =  score  +  1
+
+	SED
+	CLC
+	LDA score+2
+	ADC #$01
+	STA score+2
+	LDA score+1
+	ADC #$00
+	STA score+1
+	LDA score
+	ADC #$00
+	STA score
+	CLD
+.L0169 ;  goto startgame
+
+ jmp .startgame
+
+.
+ ; 
+
+.changeMusicNote
+ ; changeMusicNote
+
+.L0170 ;  musicPointer  =  musicPointer  +  1
+
+	INC musicPointer
+.
+ ; 
+
+.
+ ; 
+
+.L0171 ;  musicPointer  =  musicPointer  +  1
+
+	INC musicPointer
+.L0172 ;  rem value is (2 * #_OF_NOTES) - 1
+
+.L0173 ;  if musicPointer  >  29 then musicPointer  =  # - 1
+
+	LDA #29
+	CMP musicPointer
+     BCS .skipL0173
+.condpart60
+	LDA ##
+	SEC
+	SBC #1
+	STA musicPointer
+.skipL0173
+.L0174 ;  return
+
+	RTS
+ if (<*) > (<(*+10))
 	repeat ($100-<*)
 	.byte 0
 	repend
 	endif
-playercolorL010_0
+playerL018_0
 
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
- if (<*) > (<(*+8))
-	repeat ($100-<*)
-	.byte 0
-	repend
-	endif
-playercolorL011_1
-
-	.byte  $66
-	.byte  $66
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
-	.byte  $0E
- if (<*) > (<(*+2))
-	repeat ($100-<*)
-	.byte 0
-	repend
-	endif
-playerL015_0
-
-	.byte   %1111111
-	.byte   %1111111
- if (<*) > (<(*+8))
-	repeat ($100-<*)
-	.byte 0
-	repend
-	endif
-playerL016_1
-
+	.byte  %00111100
 	.byte  %01111110
-	.byte  %11111111
+	.byte  %01111110
 	.byte  %11111111
 	.byte  %11100111
 	.byte  %11111111
 	.byte  %11011011
 	.byte  %01111110
 	.byte  %00111100
+	.byte  %00011000
+ if (<*) > (<(*+10))
+	repeat ($100-<*)
+	.byte 0
+	repend
+	endif
+playerL020_1
+
+	.byte  %00111100
+	.byte  %01111110
+	.byte  %01111110
+	.byte  %11111111
+	.byte  %11100111
+	.byte  %11111111
+	.byte  %11011011
+	.byte  %01111110
+	.byte  %00111100
+	.byte  %00011000
        echo "    ",[(scoretable - *)]d , "bytes of ROM space left")
  
  
