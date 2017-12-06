@@ -82,6 +82,8 @@ end
 
  dim missile0dx = a
  dim missile0dy = b
+ dim tempx = c
+ dim tempy = d
 
 startgame
  player0x = 75
@@ -94,6 +96,7 @@ startgame
  missile0y=70
  missile0dx = 0
  missile0dy = 0
+ missile0height= 1
 
  rem displays the screen
 draw_loop
@@ -104,20 +107,34 @@ draw_loop
 
  drawscreen
  if joy0fire && missile0dx = 0 then gosub startball0
- if joy0right then player0x = player0x + 1: if player0x > 153 then player0x = 153
- if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 2
+ if joy0right then player0x = player0x + 1: if player0x > 153 then player0x = 153: xDirection = 1
+ if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 2: xDirection = -1
  missile0y = missile0y + missile0dy
  rem PADDLE COLLISIONS
  if collision(player0, missile0) then gosub collidep0b0
+ if missile0y <=01 then missile0dy=-missile0dy
+ if collision(missile0, playfield) then gosub pixelcollide0
+
+
+
 
  goto draw_loop
+
+pixelcollide0
+ tempy=(missile0y)/16
+ tempx = missile0x
+ pfpixel tempx tempy off
+ rem if missile0dx = #-1 then missile0dx = 1
+ if missile0dy = 1 then missile0dy = #-1 else missile0dx = 1
+ rem missile0dy = #-missile0dy
+return
 
 collidep0b0
  z = player0y - missile0y
  z = z/4
  if z >= 2 then missile0dy = #-1
  if z <= 1 then missile0dy = 1
- missile0dx = 1
+ missile0dy = -1
  missile0x = missile0x + missile0dx
  missile0y = missile0y + missile0dy
  return
