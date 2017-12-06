@@ -1844,6 +1844,17 @@ pflabel0
 	SBC missile0dx
 	STA missile0dx
 .skipL048
+.L049 ;  if missile0x  >= 153 then missile0dx =  - missile0dx
+
+	LDA missile0x
+	CMP #153
+     BCC .skipL049
+.condpart11
+	LDA #0
+	SEC
+	SBC missile0dx
+	STA missile0dx
+.skipL049
 .
  ; 
 
@@ -1853,7 +1864,7 @@ pflabel0
 .
  ; 
 
-.L049 ;  goto draw_loop
+.L050 ;  goto draw_loop
 
  jmp .draw_loop
 
@@ -1863,41 +1874,41 @@ pflabel0
 .pixelcollide0
  ; pixelcollide0
 
-.L050 ;  rem tempy=(missile0y)/2
+.L051 ;  rem tempy=(missile0y)/2
 
-.L051 ;  rem tempx = missile0x
+.L052 ;  rem tempx = missile0x
 
-.L052 ;  pfpixel tempx tempy off
+.L053 ;  pfpixel tempx tempy off
 
 	LDA tempx
 	LDY tempy
 	LDX #1
  jsr pfpixel
-.L053 ;  if missile0dx  <  0 then missile0dx  =  1
+.L054 ;  if missile0dx  <  0 then missile0dx  =  1
 
 	LDA missile0dx
 	CMP #0
-     BCS .skipL053
-.condpart11
+     BCS .skipL054
+.condpart12
 	LDA #1
 	STA missile0dx
-.skipL053
-.L054 ;  if missile0dy  =  1 then missile0dy  =  # - 1 else missile0dx  =  1
+.skipL054
+.L055 ;  if missile0dy  =  1 then missile0dy  =  # - 1 else missile0dx  =  1
 
 	LDA missile0dy
 	CMP #1
-     BNE .skipL054
-.condpart12
+     BNE .skipL055
+.condpart13
 	LDA ##
 	SEC
 	SBC #1
 	STA missile0dy
  jmp .skipelse0
-.skipL054
+.skipL055
 	LDA #1
 	STA missile0dx
 .skipelse0
-.L055 ;  rem missile0dy = #-missile0dy
+.L056 ;  rem missile0dy = #-missile0dy
 
 .return
  ; return
@@ -1908,17 +1919,27 @@ pflabel0
 .collidep0b0
  ; collidep0b0
 
-.L056 ;  missile0dx  =  # - 1
+.L057 ;  if missile0dx  <=  0 then missile0dx  =  1 :  if missile0dx  >  0 then missile0dx  =   - 1
 
-	LDA ##
-	SEC
-	SBC #1
+	LDA #0
+	CMP missile0dx
+     BCC .skipL057
+.condpart14
+	LDA #1
 	STA missile0dx
-.L057 ;  missile0dy  =   - 1
+	LDA #0
+	CMP missile0dx
+     BCS .skip14then
+.condpart15
+	LDA #255
+	STA missile0dx
+.skip14then
+.skipL057
+.L058 ;  missile0dy  =   - 1
 
 	LDA #255
 	STA missile0dy
-.L058 ;  return
+.L059 ;  return
 
 	RTS
 .
@@ -1927,15 +1948,15 @@ pflabel0
 .startball0
  ; startball0
 
-.L059 ;  missile0dy  =  1
+.L060 ;  missile0dy  =  1
 
 	LDA #1
 	STA missile0dy
-.L060 ;  missile0dx  =  0
+.L061 ;  missile0dx  =  0
 
 	LDA #0
 	STA missile0dx
-.L061 ;  return
+.L062 ;  return
 	RTS
  ifconst pfres
  if (<*) > (254-pfres*pfwidth)

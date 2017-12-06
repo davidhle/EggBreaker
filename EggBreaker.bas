@@ -115,7 +115,7 @@ draw_loop
  if missile0y <=01 then missile0dy=-missile0dy
  if collision(missile0, playfield) then gosub pixelcollide0
  if missile0x <=1 then missile0dx=-missile0dx
- if missile0x <=153 then missile0dx=-missile0dx
+ if missile0x >=153 then missile0dx=-missile0dx
 
 
 
@@ -131,7 +131,7 @@ pixelcollide0
 return
 
 collidep0b0
- missile0dx = #-1
+ if missile0dx <= 0 then missile0dx = 1: if missile0dx > 0 then missile0dx = -1
  missile0dy = -1
  return
 
