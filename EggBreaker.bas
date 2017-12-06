@@ -108,11 +108,12 @@ draw_loop
  if joy0right then player0x = player0x + 1: if player0x > 153 then player0x = 153: xDirection = 1
  if joy0left then player0x = player0x - 1: if player0x < 1 then player0x = 2: xDirection = -1
  missile0y = missile0y + missile0dy
- missile0x = missile0x + missile0dy
  rem PADDLE COLLISIONS
  if collision(player0, missile0) then gosub collidep0b0
  if missile0y <=01 then missile0dy=-missile0dy
  if collision(missile0, playfield) then gosub pixelcollide0
+ if missile0y >= 88 then goto startgame
+
 
 
 
@@ -123,10 +124,9 @@ pixelcollide0
  rem tempy=(missile0y)/2
  rem tempx = missile0x
  pfpixel tempx tempy off
- rem if missile0dx = #-1 then missile0dx = 1
+ if missile0dx < 0 then missile0dx = 1
  if missile0dy = 1 then missile0dy = #-1 else missile0dx = 1
  rem missile0dy = #-missile0dy
- if missile0y >= 88 then goto startgame
 return
 
 collidep0b0
